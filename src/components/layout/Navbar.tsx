@@ -82,14 +82,11 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
   return (
     <header className="sticky top-0 z-40 bg-apple-bg/80 backdrop-blur-xl border-b border-apple-border transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+        {/* Brand Logo - Logo Icon Only */}
+        <Link href="/" className="flex items-center group" aria-label="SubsManager Home">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
             <Sparkles className="w-4 h-4" />
           </div>
-          <span className="font-semibold text-apple-text tracking-tight text-base sm:text-lg">
-            Subs<span className="font-normal text-apple-secondary">Manager</span>
-          </span>
         </Link>
 
         {/* Minimal Single-Button Glassmorphism Menu Selector */}
@@ -144,11 +141,6 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
         {/* Right Actions */}
         {session?.user ? (
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Currency badge */}
-            <div className="hidden sm:flex items-center px-2.5 py-1 rounded-xl bg-apple-accent-soft text-apple-accent text-xs font-medium border border-blue-100">
-              {session.user.currency} Base Currency
-            </div>
-
             {/* Notification Bell */}
             <div className="relative" ref={notifRef}>
               <button

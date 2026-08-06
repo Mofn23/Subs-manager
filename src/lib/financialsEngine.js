@@ -31,11 +31,27 @@ function getDaysUntil(targetDate, referenceDate = new Date()) {
 }
 
 function formatCurrency(amount, currencySymbol = "$") {
-  const formatted = (amount || 0).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
+  if (amount === undefined || amount === null || isNaN(amount)) {
+    return "$0";
+  }
+  const num = Number(amount);
+  const isInteger = num % 1 === 0;
+
+  const formattedNumber = num.toLocaleString("en-US", {
+    minimumFractionDigits: isInteger ? 0 : 2,
     maximumFractionDigits: 2,
   });
-  return `${currencySymbol}${formatted}`;
+
+  let symbol = currencySymbol || "$";
+  if (!symbol || symbol.toUpperCase() === "COP" || symbol.toUpperCase() === "USD" || symbol.toUpperCase() === "MXN") {
+    symbol = "$";
+  } else if (symbol.toUpperCase() === "EUR") {
+    symbol = "€";
+  } else if (symbol.toUpperCase() === "GBP") {
+    symbol = "£";
+  }
+
+  return `${symbol}${formattedNumber}`;
 }
 
 function calculateSpendSummary(subscriptions) {
@@ -61,38 +77,22 @@ function detectSubscriptionLeaks(subscriptions, referenceDate = new Date()) {
     (s) => s.status === "ACTIVE" || s.status === "TRIAL" || s.status === "TO_CANCEL"
   );
 
-  const expiringTrials = activeSubs.filter((s) => {
+  const unusedCount = activeSubs.filter((s) => s.flaggedLowUsage).length;
+  const unusedMonthlySavings = activeSubs
+    .filter((s) => s.flaggedLowUsage)
+    .reduce((acc, sub) => acc + calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths), 0);
+
+  const trialLeaks = activeSubs.filter((s) => {
     if (s.status !== "TRIAL" || !s.trialEndDate) return false;
-    const days = getDaysUntil(s.trialEndDate, referenceDate);
-    return days >= 0 && days <= 7;
-  });
-
-  const lowUsageSubs = activeSubs.filter((s) => s.flaggedLowUsage);
-
-  const potentialMonthlySavings = lowUsageSubs.reduce((acc, sub) => {
-    return acc + calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths);
-  }, 0);
-
-  const potentialAnnualSavings = potentialMonthlySavings * 12;
-
-  const categorySpendMap = {};
-
-  activeSubs.forEach((sub) => {
-    const monthlyCost = calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths);
-    const cat = sub.category || "Other";
-    if (!categorySpendMap[cat]) {
-      categorySpendMap[cat] = { monthly: 0, count: 0 };
-    }
-    categorySpendMap[cat].monthly += monthlyCost;
-    categorySpendMap[cat].count += 1;
+    const daysLeft = getDaysUntil(s.trialEndDate, referenceDate);
+    return daysLeft >= 0 && daysLeft <= 7;
   });
 
   return {
-    expiringTrials,
-    lowUsageSubs,
-    potentialMonthlySavings,
-    potentialAnnualSavings,
-    categorySpendMap,
+    unusedCount,
+    unusedMonthlySavings,
+    unusedAnnualSavings: unusedMonthlySavings * 12,
+    trialLeaks,
   };
 }
 

@@ -32,6 +32,12 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 - **Ocultamiento Total del Presupuesto Vacío**: Si el presupuesto mensual (*Monthly Budget*) está vacío o es cero en Configuración, todo el enunciado, barra de progreso y avisos del presupuesto se eliminan del DOM por completo para una vista limpia sin ruido visual.
 - **Bloqueo Completo de Zoom y Escalado**: Configuración del `viewport` con `userScalable: false`, `maximumScale: 1` y `touch-action: manipulation` para impedir el zoom táctil/doble tap y mantener la app firme como una aplicación iOS nativa.
 
+#### 6. Depuración Visual y Formateo Ultraminimalista
+- **Logo Único Superior**: Eliminación del nombre `SubsManager` en el encabezado superior izquierdo, dejando únicamente el ícono del logo.
+- **Eliminación del Texto de Moneda (`COP`)**: Remoción de cualquier código de moneda en la interfaz (solo reservado dentro de Configuración). Los precios ahora se muestran únicamente con símbolo limpio (`$35,000` en lugar de `COP $35,000`).
+- **Remoción de Decimales Innecesarios (`.00`)**: Los números enteros ahora se formatean sin ceros decimales (`$35,000` o `$8,500` en lugar de `$35,000.00`), mientras que los decimales reales (`$22.99`) conservan su precisión.
+- **Sección "Requires Attention" Simplificada**: Rediseño de las alertas a barras ultra limpias en una sola línea con el formato exacto: `Datos Mama $35,000 (In 2 days)`.
+
 ---
 
 ## [v1.0.0] - 2026-08-05 (MVP Initial Release) - COMPLETADO ✅
