@@ -70,13 +70,29 @@ export function getDaysUntil(targetDate: Date | string, referenceDate: Date = ne
 
 /**
  * Formats currency values cleanly in Apple HIG style.
+ * Omits trailing .00 decimal clutter on integers and cleans currency symbols.
  */
 export function formatCurrency(amount: number, currencySymbol: string = "$"): string {
-  const formatted = (amount || 0).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
+  if (amount === undefined || amount === null || isNaN(amount)) {
+    return "$0";
+  }
+  const num = Number(amount);
+  const isInteger = num % 1 === 0;
+
+  const formattedNumber = num.toLocaleString("en-US", {
+    minimumFractionDigits: isInteger ? 0 : 2,
     maximumFractionDigits: 2,
   });
-  return `${currencySymbol}${formatted}`;
+
+  let symbol = "$";
+  if (currencySymbol) {
+    const clean = currencySymbol.trim().toUpperCase();
+    if (clean === "EUR" || clean === "€") symbol = "€";
+    else if (clean === "GBP" || clean === "£") symbol = "£";
+    else symbol = "$";
+  }
+
+  return `${symbol}${formattedNumber}`;
 }
 
 /**

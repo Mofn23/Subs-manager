@@ -34,8 +34,8 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 
 #### 6. Depuración Visual y Formateo Ultraminimalista
 - **Logo Único Superior**: Eliminación del nombre `SubsManager` en el encabezado superior izquierdo, dejando únicamente el ícono del logo.
-- **Eliminación del Texto de Moneda (`COP`)**: Remoción de cualquier código de moneda en la interfaz (solo reservado dentro de Configuración). Los precios ahora se muestran únicamente con símbolo limpio (`$35,000` en lugar de `COP $35,000`).
-- **Remoción de Decimales Innecesarios (`.00`)**: Los números enteros ahora se formatean sin ceros decimales (`$35,000` o `$8,500` en lugar de `$35,000.00`), mientras que los decimales reales (`$22.99`) conservan su precisión.
+- **Eliminación Total del Texto de Moneda (`COP`)**: Corrección de la función `formatCurrency` en `src/lib/financials.ts` para sanitizar cualquier código de moneda de 3 letras (`COP`, `USD`, `MXN`), mostrando únicamente el símbolo limpio (`$35,000` en lugar de `COP $35,000.00`).
+- **Remoción Absoluta de Decimales Innecesarios (`.00`)**: Formateo de todos los montos enteros sin decimales (`$218,200` y `$35,000` en lugar de `$218,200.00`), conservando la precisión únicamente en números con centavos reales (ej: `$22.99`).
 - **Sección "Requires Attention" Simplificada**: Rediseño de las alertas a barras ultra limpias en una sola línea con el formato exacto: `Datos Mama $35,000 (In 2 days)`.
 
 ---

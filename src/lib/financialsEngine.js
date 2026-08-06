@@ -42,13 +42,12 @@ function formatCurrency(amount, currencySymbol = "$") {
     maximumFractionDigits: 2,
   });
 
-  let symbol = currencySymbol || "$";
-  if (!symbol || symbol.toUpperCase() === "COP" || symbol.toUpperCase() === "USD" || symbol.toUpperCase() === "MXN") {
-    symbol = "$";
-  } else if (symbol.toUpperCase() === "EUR") {
-    symbol = "€";
-  } else if (symbol.toUpperCase() === "GBP") {
-    symbol = "£";
+  let symbol = "$";
+  if (currencySymbol) {
+    const clean = String(currencySymbol).trim().toUpperCase();
+    if (clean === "EUR" || clean === "€") symbol = "€";
+    else if (clean === "GBP" || clean === "£") symbol = "£";
+    else symbol = "$";
   }
 
   return `${symbol}${formattedNumber}`;
