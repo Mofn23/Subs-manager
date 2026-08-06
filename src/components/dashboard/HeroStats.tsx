@@ -26,6 +26,15 @@ export function HeroStats({
 
   const currencyCode = currency && currency.trim() ? currency.trim().toUpperCase() : "COP";
 
+  const formatNumberOnly = (amount: number) => {
+    const num = Number(amount || 0);
+    const isInteger = num % 1 === 0;
+    return num.toLocaleString("en-US", {
+      minimumFractionDigits: isInteger ? 0 : 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   return (
     <div className="space-y-4">
       {/* Main Ultra-Minimal Centered Hero Card */}
@@ -35,10 +44,10 @@ export function HeroStats({
           Total Monthly Spend
         </div>
 
-        {/* Predominant Big Bold Main Value + Subtle COP */}
+        {/* Predominant Big Bold Main Value + Subtle COP (No $ symbol) */}
         <div className="flex items-baseline justify-center gap-1.5 my-1">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-apple-text tracking-tight">
-            {formatCurrency(monthlyTotal, currency)}
+            {formatNumberOnly(monthlyTotal)}
           </h1>
           <span className="text-base sm:text-lg font-light text-apple-tertiary tracking-normal">
             {currencyCode}
@@ -47,7 +56,7 @@ export function HeroStats({
 
         {/* Small Annual Value directly underneath */}
         <div className="flex items-baseline justify-center gap-1 text-xs sm:text-sm font-medium text-apple-tertiary mt-0.5">
-          <span>{formatCurrency(annualTotal, currency)}</span>
+          <span>{formatNumberOnly(annualTotal)}</span>
           <span className="font-light">Annual</span>
         </div>
 
