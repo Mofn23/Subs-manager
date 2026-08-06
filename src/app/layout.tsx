@@ -2,7 +2,7 @@ import { Providers } from "@/components/common/Providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +12,14 @@ export const metadata: Metadata = {
   description:
     "Ultraminimal personal & family subscription management. Direct renewal timeline, cost annualization, trial tracking, leak detection, and cancellation workflow.",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -32,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col bg-apple-bg text-apple-text antialiased selection:bg-blue-100 selection:text-blue-900">
+      <body className="min-h-screen flex flex-col bg-apple-bg text-apple-text antialiased selection:bg-blue-100 selection:text-blue-900 touch-manipulation">
         <Providers>
           <Navbar notifications={notifications} />
           <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">

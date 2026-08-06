@@ -28,6 +28,10 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 - **Botón Único selector estilo Apple**: Botón flotante tipo píldora con efecto cristal (`Dashboard ˅`) que muestra la vista activa actual.
 - **Menú Desplegable Flotante Translúcido**: Menú emergente con estética **Apple Glassmorphism** (`backdrop-blur-2xl`, bordes suaves, fondo translúcido oscuro, checklist `✓` de elemento activo e íconos alineados).
 
+#### 5. Limpieza Dinámica del Dashboard y Bloqueo de Zoom
+- **Ocultamiento Total del Presupuesto Vacío**: Si el presupuesto mensual (*Monthly Budget*) está vacío o es cero en Configuración, todo el enunciado, barra de progreso y avisos del presupuesto se eliminan del DOM por completo para una vista limpia sin ruido visual.
+- **Bloqueo Completo de Zoom y Escalado**: Configuración del `viewport` con `userScalable: false`, `maximumScale: 1` y `touch-action: manipulation` para impedir el zoom táctil/doble tap y mantener la app firme como una aplicación iOS nativa.
+
 ---
 
 ## [v1.0.0] - 2026-08-05 (MVP Initial Release) - COMPLETADO ✅
