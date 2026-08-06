@@ -141,20 +141,20 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-apple-text text-sm">{event.name}</h4>
+                            <h4 className="font-semibold text-apple-text dark:text-white text-sm">{event.name}</h4>
                             {isTrial && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-semibold flex items-center gap-1">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-semibold flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 Trial Expiry
                               </span>
                             )}
                             {isHighCost && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-50 text-blue-700 font-medium">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-medium">
                                 High Value
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-apple-secondary mt-0.5">
+                          <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
                             {event.provider} • {event.category}
                           </p>
                         </div>
@@ -163,10 +163,10 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
                       {/* Right: Days countdown & Price */}
                       <div className="text-right flex items-center gap-3">
                         <div>
-                          <div className="font-semibold text-apple-text text-sm">
+                          <div className="font-semibold text-apple-text dark:text-white text-sm">
                             {formatCurrency(event.price, currency)}
                           </div>
-                          <div className="text-[11px] text-apple-tertiary">
+                          <div className="text-[11px] text-apple-tertiary dark:text-neutral-400">
                             {event.daysUntil === 0
                               ? "Renews Today"
                               : `in ${event.daysUntil} day${event.daysUntil > 1 ? "s" : ""}`}
@@ -178,7 +178,7 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
                             href={event.cancelUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 rounded-xl text-apple-tertiary hover:text-apple-text hover:bg-apple-bg transition shrink-0"
+                            className="p-2 rounded-xl text-apple-tertiary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-apple-bg dark:hover:bg-neutral-800 transition shrink-0"
                             title="Direct cancellation URL"
                           >
                             <ExternalLink className="w-4 h-4" />
