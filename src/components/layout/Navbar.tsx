@@ -8,12 +8,15 @@ import {
   ChevronDown,
   CreditCard,
   LogOut,
+  Moon,
   PieChart,
   Settings,
   ShieldAlert,
   Sparkles,
+  Sun,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -76,11 +79,18 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
     { label: "Settings", href: "/settings", icon: Settings },
   ];
 
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const activeLink = navLinks.find((link) => link.href === pathname) || navLinks[0];
   const ActiveIcon = activeLink.icon;
 
   return (
-    <header className="sticky top-0 z-40 bg-apple-bg/80 backdrop-blur-xl border-b border-apple-border transition-all">
+    <header className="sticky top-0 z-40 bg-apple-bg/80 dark:bg-[#0C0C0E]/80 backdrop-blur-xl border-b border-apple-border dark:border-white/10 transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand Logo - Logo Icon Only */}
         <Link href="/" className="flex items-center group" aria-label="SubsManager Home">
@@ -94,13 +104,13 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/5 hover:bg-black/10 border border-apple-border text-xs font-semibold text-apple-text backdrop-blur-md transition-all shadow-sm active:scale-95"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border border-apple-border dark:border-white/10 text-xs font-semibold text-apple-text dark:text-white backdrop-blur-md transition-all shadow-sm active:scale-95"
               aria-label="Toggle navigation menu"
             >
               <ActiveIcon className="w-3.5 h-3.5 text-blue-500" />
-              <span className="text-apple-text">{activeLink.label}</span>
+              <span className="text-apple-text dark:text-white">{activeLink.label}</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-apple-secondary transition-transform duration-200 ${
+                className={`w-3.5 h-3.5 text-apple-secondary dark:text-neutral-400 transition-transform duration-200 ${
                   isMenuOpen ? "rotate-180" : ""
                 }`}
               />
@@ -108,7 +118,7 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
 
             {/* Apple Glassmorphism Dropdown Menu */}
             {isMenuOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 bg-neutral-900/90 backdrop-blur-2xl border border-white/15 shadow-2xl rounded-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-white">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 bg-neutral-900/90 dark:bg-[#16161A]/95 backdrop-blur-2xl border border-white/15 shadow-2xl rounded-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-white">
                 <div className="space-y-0.5">
                   {navLinks.map((link) => {
                     const Icon = link.icon;
@@ -141,16 +151,30 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
         {/* Right Actions */}
         {session?.user ? (
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-xl text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all border border-transparent"
+              aria-label="Toggle Dark/Light theme"
+              title={resolvedTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {mounted && resolvedTheme === "dark" ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+            </button>
+
             {/* Notification Bell */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 rounded-xl text-apple-secondary hover:text-apple-text hover:bg-white/80 transition-all border border-transparent hover:border-apple-border"
+                className="relative p-2 rounded-xl text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all border border-transparent"
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 ring-2 ring-apple-bg animate-pulse" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 ring-2 ring-apple-bg dark:ring-[#0C0C0E] animate-pulse" />
                 )}
               </button>
 

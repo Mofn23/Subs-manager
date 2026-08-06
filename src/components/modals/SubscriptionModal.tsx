@@ -147,16 +147,16 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-apple-modal border border-apple-border overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#16161A] text-apple-text dark:text-white w-full max-w-lg rounded-3xl shadow-apple-modal border border-apple-border dark:border-white/15 overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-apple-border">
-          <h3 className="font-semibold text-apple-text text-base">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-apple-border dark:border-white/10">
+          <h3 className="font-semibold text-apple-text dark:text-white text-base">
             {subscriptionToEdit ? "Edit Subscription" : "Add Subscription"}
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-xl text-apple-tertiary hover:text-apple-text hover:bg-apple-bg transition"
+            className="p-1 rounded-xl text-apple-tertiary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-apple-bg dark:hover:bg-white/10 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -165,7 +165,7 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
         {/* Form Body */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 overflow-y-auto space-y-4">
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-apple-danger-soft text-apple-danger text-xs font-medium border border-rose-200">
+            <div className="p-3 rounded-xl bg-apple-danger-soft dark:bg-rose-500/20 text-apple-danger dark:text-rose-300 text-xs font-medium border border-rose-200 dark:border-rose-500/30">
               {errorMsg}
             </div>
           )}
@@ -175,33 +175,33 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="w-16 h-16 rounded-3xl bg-apple-bg hover:bg-apple-border/50 border border-apple-border shadow-sm flex items-center justify-center text-3xl transition-transform active:scale-95 relative group"
+              className="w-16 h-16 rounded-3xl bg-apple-bg dark:bg-neutral-800 hover:bg-apple-border/50 dark:hover:bg-neutral-700 border border-apple-border dark:border-white/10 shadow-sm flex items-center justify-center text-3xl transition-transform active:scale-95 relative group"
               title="Choose Emoji Icon"
             >
               {selectedIcon || "📦"}
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] shadow-sm border border-white group-hover:scale-110 transition-transform">
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] shadow-sm border border-white dark:border-[#16161A] group-hover:scale-110 transition-transform">
                 <Sparkles className="w-3 h-3" />
               </div>
             </button>
-            <span className="text-[11px] text-apple-tertiary mt-1.5 font-medium">
+            <span className="text-[11px] text-apple-tertiary dark:text-neutral-400 mt-1.5 font-medium">
               Tap circle to choose emoji
             </span>
 
             {/* Apple Style Emoji Selector Popup Grid */}
             {showEmojiPicker && (
-              <div className="w-full mt-3 p-3 bg-apple-bg border border-apple-border rounded-2xl animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between text-xs font-semibold text-apple-secondary mb-2 px-1">
+              <div className="w-full mt-3 p-3 bg-apple-bg dark:bg-[#1C1C22] border border-apple-border dark:border-white/10 rounded-2xl animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between text-xs font-semibold text-apple-secondary dark:text-neutral-300 mb-2 px-1">
                   <span>Select Apple Emoji</span>
                   <button
                     type="button"
                     onClick={() => setShowEmojiPicker(false)}
-                    className="text-apple-tertiary hover:text-apple-text text-[11px]"
+                    className="text-apple-tertiary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white text-[11px]"
                   >
                     Close ✕
                   </button>
                 </div>
 
-                <div className="grid grid-cols-7 gap-1.5 max-h-36 overflow-y-auto p-1 bg-white rounded-xl border border-apple-border">
+                <div className="grid grid-cols-7 gap-1.5 max-h-36 overflow-y-auto p-1 bg-white dark:bg-[#16161A] rounded-xl border border-apple-border dark:border-white/10">
                   {PRESET_EMOJIS.map((emoji) => (
                     <button
                       key={emoji}
@@ -212,8 +212,8 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
                         setHasCustomIcon(true);
                         setShowEmojiPicker(false);
                       }}
-                      className={`w-9 h-9 text-xl rounded-xl flex items-center justify-center hover:bg-black/5 transition-transform active:scale-90 ${
-                        selectedIcon === emoji ? "bg-blue-100 ring-2 ring-blue-500/40" : ""
+                      className={`w-9 h-9 text-xl rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 transition-transform active:scale-90 ${
+                        selectedIcon === emoji ? "bg-blue-100 dark:bg-blue-500/30 ring-2 ring-blue-500/40" : ""
                       }`}
                     >
                       {emoji}
@@ -227,21 +227,21 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
           {/* Name & Provider */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Name</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Name</label>
               <input
                 {...register("name")}
                 placeholder="e.g. Netflix"
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white placeholder:text-apple-tertiary dark:placeholder:text-neutral-500"
               />
               {errors.name && <p className="text-[10px] text-apple-danger mt-1">{errors.name.message as string}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Provider / Brand</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Provider / Brand</label>
               <input
                 {...register("provider")}
                 placeholder="e.g. Netflix Inc."
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white placeholder:text-apple-tertiary dark:placeholder:text-neutral-500"
               />
               {errors.provider && <p className="text-[10px] text-apple-danger mt-1">{errors.provider.message as string}</p>}
             </div>
@@ -250,10 +250,10 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
           {/* Category & Status */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Category</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Category</label>
               <select
                 {...register("category")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -264,10 +264,10 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Status</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Status</label>
               <select
                 {...register("status")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               >
                 <option value="ACTIVE">Active</option>
                 <option value="TRIAL">Trial</option>
@@ -280,21 +280,21 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
           {/* Price & Billing Cycle */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Price ({currency})</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Price ({currency})</label>
               <input
                 type="number"
                 step="any"
                 {...register("price")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               />
               {errors.price && <p className="text-[10px] text-apple-danger mt-1">{errors.price.message as string}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Billing Cycle</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Billing Cycle</label>
               <select
                 {...register("billingCycle")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               >
                 <option value="WEEKLY">Weekly</option>
                 <option value="MONTHLY">Monthly</option>
@@ -308,12 +308,12 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
           {/* Custom Interval Months (Only if CUSTOM) */}
           {watchCycle === "CUSTOM" && (
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Interval (Months)</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Interval (Months)</label>
               <input
                 type="number"
                 min="1"
                 {...register("customIntervalMonths")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               />
             </div>
           )}
@@ -321,11 +321,11 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
           {/* Renewal & Trial Dates */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Next Renewal Date</label>
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Next Renewal Date</label>
               <input
                 type="date"
                 {...register("nextRenewalDate")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               />
               {errors.nextRenewalDate && (
                 <p className="text-[10px] text-apple-danger mt-1">{errors.nextRenewalDate.message as string}</p>
@@ -333,40 +333,40 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">
+              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">
                 {watchStatus === "TRIAL" ? "Trial Expiry Date *" : "Trial Expiry Date (Optional)"}
               </label>
               <input
                 type="date"
                 {...register("trialEndDate")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
               />
             </div>
           </div>
 
           {/* Cancellation Portal Link */}
           <div>
-            <label className="block text-xs font-medium text-apple-secondary mb-1">Direct Cancel URL (Optional)</label>
+            <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Direct Cancel URL (Optional)</label>
             <input
               {...register("cancelUrl")}
               placeholder="https://..."
-              className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+              className="w-full px-3.5 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white placeholder:text-apple-tertiary dark:placeholder:text-neutral-500"
             />
           </div>
 
           {/* Footer Buttons */}
-          <div className="pt-4 flex items-center justify-end gap-2 border-t border-apple-border">
+          <div className="pt-4 flex items-center justify-end gap-2 border-t border-apple-border dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-apple-secondary hover:text-apple-text transition"
+              className="px-4 py-2 rounded-xl text-xs font-medium text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl text-xs font-medium bg-apple-text text-white hover:bg-black/80 transition shadow-apple disabled:opacity-50"
+              className="px-5 py-2 rounded-xl text-xs font-medium bg-apple-text dark:bg-white text-white dark:text-black hover:opacity-90 transition shadow-apple disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : subscriptionToEdit ? "Save Changes" : "Create Subscription"}
             </button>

@@ -118,18 +118,18 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
       {/* Subscriptions List Control Section */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-apple-text tracking-tight">Your Subscriptions</h2>
+          <h2 className="text-lg font-semibold text-apple-text dark:text-white tracking-tight">Your Subscriptions</h2>
 
           <div className="flex items-center gap-3">
             {/* Search Box */}
             <div className="relative flex-1 sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-apple-tertiary" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-apple-tertiary dark:text-neutral-400" />
               <input
                 type="text"
                 placeholder="Search provider, category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white border border-apple-border text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text shadow-sm"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#16161A] border border-apple-border dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white shadow-sm placeholder:text-apple-tertiary dark:placeholder:text-neutral-500"
               />
             </div>
 
@@ -139,7 +139,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
                 setEditingSub(null);
                 setIsModalOpen(true);
               }}
-              className="px-4 py-1.5 rounded-xl bg-apple-text text-white text-xs font-medium hover:opacity-90 transition flex items-center gap-1.5 shadow-sm shrink-0"
+              className="px-4 py-1.5 rounded-xl bg-apple-text dark:bg-white text-white dark:text-black text-xs font-medium hover:opacity-90 transition flex items-center gap-1.5 shadow-sm shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Subscription
@@ -152,12 +152,12 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
 
         {/* Cards Grid */}
         {filteredSubscriptions.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-apple-border p-8 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-apple-bg flex items-center justify-center text-apple-tertiary mx-auto">
+          <div className="text-center py-16 bg-white dark:bg-[#16161A] rounded-3xl border border-apple-border dark:border-white/10 p-8 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-apple-bg dark:bg-neutral-800 flex items-center justify-center text-apple-tertiary dark:text-neutral-400 mx-auto">
               <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-apple-text text-sm">No subscriptions found</h3>
-            <p className="text-xs text-apple-secondary max-w-sm mx-auto">
+            <h3 className="font-semibold text-apple-text dark:text-white text-sm">No subscriptions found</h3>
+            <p className="text-xs text-apple-secondary dark:text-neutral-400 max-w-sm mx-auto">
               {searchQuery
                 ? `No results matching "${searchQuery}". Try adjusting your search query.`
                 : "You don't have any subscriptions in this view yet."}
@@ -167,7 +167,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
                 setEditingSub(null);
                 setIsModalOpen(true);
               }}
-              className="mt-2 px-4 py-2 rounded-xl bg-apple-accent-soft text-apple-accent text-xs font-medium hover:bg-blue-100 transition inline-flex items-center gap-1.5"
+              className="mt-2 px-4 py-2 rounded-xl bg-apple-accent-soft dark:bg-blue-500/20 text-apple-accent dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-500/30 transition inline-flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               Add your first subscription

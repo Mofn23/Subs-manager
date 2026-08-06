@@ -32,7 +32,7 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
 
   return (
     <div className="space-y-2.5">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-apple-secondary px-1">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-apple-secondary dark:text-neutral-400 px-1">
         Requires Attention
       </h3>
 
@@ -44,13 +44,13 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
           return (
             <div
               key={sub.id}
-              className="flex items-center justify-between px-5 py-3.5 rounded-full bg-white border border-amber-300/80 shadow-[0_2px_10px_rgba(251,191,36,0.12)] hover:shadow-[0_4px_14px_rgba(251,191,36,0.22)] transition-all text-xs font-medium text-apple-text"
+              className="flex items-center justify-between px-5 py-3.5 rounded-full bg-white dark:bg-[#16161A] border border-amber-300/80 dark:border-amber-400/50 shadow-[0_2px_10px_rgba(251,191,36,0.12)] hover:shadow-[0_4px_14px_rgba(251,191,36,0.22)] transition-all text-xs font-medium text-apple-text dark:text-white"
             >
               {/* Ultra-minimal single line with delicate subtle yellow relief pill border */}
               <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="font-semibold text-apple-text text-sm">{sub.name}</span>
-                <span className="text-apple-secondary font-medium">{formattedPrice}</span>
-                <span className="text-apple-tertiary font-normal">({daysText})</span>
+                <span className="font-semibold text-apple-text dark:text-white text-sm">{sub.name}</span>
+                <span className="text-apple-secondary dark:text-neutral-400 font-medium">{formattedPrice}</span>
+                <span className="text-apple-tertiary dark:text-neutral-500 font-normal">({daysText})</span>
               </div>
 
               {sub.cancelUrl && (

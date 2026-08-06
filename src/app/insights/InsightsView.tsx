@@ -59,45 +59,45 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-apple-border shadow-apple">
-        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-apple-secondary mb-1">
-          <PieChart className="w-3.5 h-3.5 text-apple-tertiary" />
+      <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple">
+        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-apple-secondary dark:text-neutral-400 mb-1">
+          <PieChart className="w-3.5 h-3.5 text-apple-tertiary dark:text-neutral-500" />
           Financial Intelligence
         </div>
-        <h1 className="text-2xl font-semibold text-apple-text tracking-tight">Subscription Insights</h1>
-        <p className="text-xs text-apple-secondary mt-0.5">
+        <h1 className="text-2xl font-semibold text-apple-text dark:text-white tracking-tight">Subscription Insights</h1>
+        <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
           Deep visibility into expense distribution, top costs, and potential monthly savings.
         </p>
       </div>
 
       {/* Optimization & Leak Detection Highlight Card */}
-      <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/60 rounded-3xl p-6 border border-blue-100/80 shadow-apple space-y-4">
+      <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/60 dark:from-blue-950/30 dark:to-indigo-950/20 rounded-3xl p-6 border border-blue-100/80 dark:border-blue-500/20 shadow-apple space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-sm">
               <TrendingDown className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-apple-text text-base">Subscription Leak Detector</h3>
-              <p className="text-xs text-apple-secondary">
+              <h3 className="font-semibold text-apple-text dark:text-white text-base">Subscription Leak Detector</h3>
+              <p className="text-xs text-apple-secondary dark:text-neutral-400">
                 Identify underutilized or trial subscriptions draining your budget.
               </p>
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-xs font-medium text-apple-secondary">Potential Monthly Savings</div>
-            <div className="text-xl font-bold text-apple-accent">
+            <div className="text-xs font-medium text-apple-secondary dark:text-neutral-400">Potential Monthly Savings</div>
+            <div className="text-xl font-bold text-apple-accent dark:text-blue-400">
               {formatCurrency(leaks.potentialMonthlySavings, currency)}/mo
             </div>
-            <div className="text-[10px] text-apple-tertiary font-medium">
+            <div className="text-[10px] text-apple-tertiary dark:text-neutral-400 font-medium">
               ({formatCurrency(leaks.potentialAnnualSavings, currency)}/yr)
             </div>
           </div>
         </div>
 
         {leaks.lowUsageSubs.length === 0 && leaks.expiringTrials.length === 0 ? (
-          <div className="p-4 rounded-2xl bg-white/80 border border-blue-100 text-xs text-apple-secondary flex items-center gap-2">
+          <div className="p-4 rounded-2xl bg-white/80 dark:bg-[#16161A]/80 border border-blue-100 dark:border-blue-500/20 text-xs text-apple-secondary dark:text-neutral-300 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
             Your portfolio is optimized! No low-usage subscriptions or expiring trials detected.
           </div>
@@ -106,14 +106,14 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
             {leaks.lowUsageSubs.map((sub) => (
               <div
                 key={sub.id}
-                className="p-3.5 rounded-2xl bg-white border border-blue-100 flex items-center justify-between gap-4 text-xs"
+                className="p-3.5 rounded-2xl bg-white dark:bg-[#16161A] border border-blue-100 dark:border-blue-500/20 flex items-center justify-between gap-4 text-xs"
               >
                 <div>
-                  <span className="font-semibold text-apple-text">{sub.name}</span>
-                  <span className="text-apple-secondary ml-2">Flagged as low usage</span>
+                  <span className="font-semibold text-apple-text dark:text-white">{sub.name}</span>
+                  <span className="text-apple-secondary dark:text-neutral-400 ml-2">Flagged as low usage</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-apple-text">
+                  <span className="font-semibold text-apple-text dark:text-white">
                     {formatCurrency(
                       calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths),
                       currency
@@ -122,7 +122,7 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
                   </span>
                   <Link
                     href="/cancellation"
-                    className="px-3 py-1 rounded-xl bg-apple-accent-soft text-apple-accent text-[11px] font-medium hover:bg-blue-100 transition"
+                    className="px-3 py-1 rounded-xl bg-apple-accent-soft dark:bg-blue-500/20 text-apple-accent dark:text-blue-400 text-[11px] font-medium hover:bg-blue-100 dark:hover:bg-blue-500/30 transition"
                   >
                     Cancel & Save
                   </Link>
@@ -136,28 +136,28 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
       {/* Grid: Top 5 Expensive + Category Spend */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Top 5 Most Expensive */}
-        <div className="bg-white rounded-3xl p-6 border border-apple-border shadow-apple space-y-4">
-          <h3 className="font-semibold text-apple-text text-sm">Top 5 Most Expensive</h3>
+        <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 border border-apple-border dark:border-white/10 shadow-apple space-y-4">
+          <h3 className="font-semibold text-apple-text dark:text-white text-sm">Top 5 Most Expensive</h3>
 
           <div className="space-y-3">
             {top5Subscriptions.map((sub, idx) => (
-              <div key={sub.id} className="flex items-center justify-between text-xs pb-2.5 border-b border-apple-border last:border-0 last:pb-0">
+              <div key={sub.id} className="flex items-center justify-between text-xs pb-2.5 border-b border-apple-border dark:border-white/10 last:border-0 last:pb-0">
                 <div className="flex items-center gap-3">
-                  <span className="w-5 h-5 rounded-full bg-apple-bg flex items-center justify-center font-bold text-[10px] text-apple-tertiary">
+                  <span className="w-5 h-5 rounded-full bg-apple-bg dark:bg-neutral-800 flex items-center justify-center font-bold text-[10px] text-apple-tertiary dark:text-neutral-400">
                     {idx + 1}
                   </span>
                   <div>
-                    <div className="font-semibold text-apple-text">{sub.name}</div>
-                    <div className="text-[11px] text-apple-tertiary">{sub.category}</div>
+                    <div className="font-semibold text-apple-text dark:text-white">{sub.name}</div>
+                    <div className="text-[11px] text-apple-tertiary dark:text-neutral-400">{sub.category}</div>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="font-semibold text-apple-text">
+                  <div className="font-semibold text-apple-text dark:text-white">
                     {formatCurrency(sub.monthlyPrice, currency)}/mo
                   </div>
                   {sub.billingCycle !== "MONTHLY" && (
-                    <div className="text-[10px] text-apple-tertiary">
+                    <div className="text-[10px] text-apple-tertiary dark:text-neutral-400">
                       {formatCurrency(sub.price, currency)} ({sub.billingCycle.toLowerCase()})
                     </div>
                   )}
@@ -168,19 +168,19 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
         </div>
 
         {/* Category Spend Distribution */}
-        <div className="bg-white rounded-3xl p-6 border border-apple-border shadow-apple space-y-4">
-          <h3 className="font-semibold text-apple-text text-sm">Spend by Category</h3>
+        <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 border border-apple-border dark:border-white/10 shadow-apple space-y-4">
+          <h3 className="font-semibold text-apple-text dark:text-white text-sm">Spend by Category</h3>
 
           <div className="space-y-3">
             {categoryBreakdown.map((cat) => (
               <div key={cat.category} className="space-y-1">
                 <div className="flex items-center justify-between text-xs font-medium">
-                  <span className="text-apple-text">{cat.category}</span>
-                  <span className="text-apple-secondary">
+                  <span className="text-apple-text dark:text-white">{cat.category}</span>
+                  <span className="text-apple-secondary dark:text-neutral-400">
                     {formatCurrency(cat.amount, currency)}/mo ({Math.round(cat.percentage)}%)
                   </span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-apple-bg overflow-hidden border border-apple-border">
+                <div className="w-full h-2 rounded-full bg-apple-bg dark:bg-neutral-800 overflow-hidden border border-apple-border dark:border-white/10">
                   <div
                     className="h-full bg-blue-500 rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(cat.percentage, 100)}%` }}

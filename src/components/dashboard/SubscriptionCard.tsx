@@ -27,16 +27,16 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-apple-success-soft text-emerald-800 font-medium">Active</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-apple-success-soft dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-medium">Active</span>;
       case "TRIAL":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-apple-warning-soft text-amber-800 font-medium">Trial</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-apple-warning-soft dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-medium">Trial</span>;
       case "PAUSED":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 text-gray-700 font-medium">Paused</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 font-medium">Paused</span>;
       case "TO_CANCEL":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-800 font-medium">To Cancel</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 font-medium">To Cancel</span>;
       case "CANCELLED":
       case "VERIFIED_CANCELLED":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 text-gray-500 font-medium line-through">Cancelled</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 font-medium line-through">Cancelled</span>;
       default:
         return null;
     }
@@ -54,29 +54,29 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 border border-apple-border shadow-apple hover:shadow-apple-hover transition-all group relative">
+    <div className="bg-white dark:bg-[#16161A] rounded-2xl p-5 border border-apple-border dark:border-white/10 shadow-apple hover:shadow-apple-hover transition-all group relative">
       <div className="flex items-start justify-between gap-4">
         {/* Left: Icon & Name */}
         <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-apple-bg flex items-center justify-center text-xl border border-apple-border group-hover:scale-105 transition-transform shrink-0 shadow-sm">
+          <div className="w-10 h-10 rounded-2xl bg-apple-bg dark:bg-neutral-800 flex items-center justify-center text-xl border border-apple-border dark:border-white/10 group-hover:scale-105 transition-transform shrink-0 shadow-sm">
             {subscription.icon || getAutoEmoji(subscription.name, subscription.category)}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-apple-text text-sm">{subscription.name}</h4>
+              <h4 className="font-semibold text-apple-text dark:text-white text-sm">{subscription.name}</h4>
               {getStatusBadge(subscription.status)}
             </div>
-            <p className="text-xs text-apple-secondary mt-0.5">{subscription.provider}</p>
+            <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">{subscription.provider}</p>
           </div>
         </div>
 
         {/* Right: Price & Options */}
         <div className="flex items-start gap-2">
           <div className="text-right">
-            <div className="font-semibold text-apple-text text-sm">
+            <div className="font-semibold text-apple-text dark:text-white text-sm">
               {formatCurrency(subscription.price, currency)}
             </div>
-            <div className="text-[11px] text-apple-tertiary">
+            <div className="text-[11px] text-apple-tertiary dark:text-neutral-400">
               {subscription.billingCycle === "MONTHLY"
                 ? "/ month"
                 : `${formatCurrency(monthlyEquivalent, currency)}/mo (${subscription.billingCycle.toLowerCase()})`}
@@ -87,7 +87,7 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 rounded-xl text-apple-tertiary hover:text-apple-text hover:bg-apple-bg transition"
+              className="p-1.5 rounded-xl text-apple-tertiary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-apple-bg dark:hover:bg-neutral-800 transition"
               aria-label="Options"
             >
               <MoreVertical className="w-4 h-4" />
@@ -95,23 +95,23 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
 
             {/* Context Dropdown */}
             {showMenu && (
-              <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-apple-modal border border-apple-border py-1.5 z-30 text-xs animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 mt-1 w-44 bg-white dark:bg-[#1C1C22] rounded-xl shadow-apple-modal border border-apple-border dark:border-white/15 py-1.5 z-30 text-xs animate-in fade-in zoom-in-95">
                 <button
                   onClick={() => {
                     setShowMenu(false);
                     onEdit(subscription);
                   }}
-                  className="w-full text-left px-3.5 py-2 text-apple-text hover:bg-apple-bg flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2 text-apple-text dark:text-white hover:bg-apple-bg dark:hover:bg-white/10 flex items-center gap-2"
                 >
-                  <Edit2 className="w-3.5 h-3.5 text-apple-secondary" />
+                  <Edit2 className="w-3.5 h-3.5 text-apple-secondary dark:text-neutral-400" />
                   Edit details
                 </button>
 
                 <button
                   onClick={handleToggleFlag}
-                  className="w-full text-left px-3.5 py-2 text-apple-text hover:bg-apple-bg flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2 text-apple-text dark:text-white hover:bg-apple-bg dark:hover:bg-white/10 flex items-center gap-2"
                 >
-                  <Flag className={`w-3.5 h-3.5 ${flagged ? "text-amber-500 fill-amber-500" : "text-apple-secondary"}`} />
+                  <Flag className={`w-3.5 h-3.5 ${flagged ? "text-amber-500 fill-amber-500" : "text-apple-secondary dark:text-neutral-400"}`} />
                   {flagged ? "Unflag review" : "Flag as low usage"}
                 </button>
 
