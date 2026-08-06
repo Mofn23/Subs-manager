@@ -37,8 +37,11 @@ export function HeroStats({
               Total Monthly Spend
             </div>
             <div className="flex items-baseline gap-3">
-              <h1 className="text-3xl sm:text-4xl font-semibold text-apple-text tracking-tight">
-                {formatCurrency(monthlyTotal, currency)}
+              <h1 className="text-3xl sm:text-4xl font-semibold text-apple-text tracking-tight flex items-baseline gap-1.5">
+                <span>{formatCurrency(monthlyTotal, currency)}</span>
+                <span className="text-sm sm:text-base font-light text-apple-tertiary tracking-normal">
+                  {currency && currency.trim() ? currency.trim().toUpperCase() : "COP"}
+                </span>
               </h1>
               <span className="text-xs text-apple-tertiary font-normal">/ month across {activeCount} subs</span>
             </div>

@@ -34,7 +34,7 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 
 #### 6. Depuración Visual y Formateo Ultraminimalista
 - **Logo Único Superior**: Eliminación del nombre `SubsManager` en el encabezado superior izquierdo, dejando únicamente el ícono del logo.
-- **Eliminación Total del Texto de Moneda (`COP`)**: Corrección de la función `formatCurrency` en `src/lib/financials.ts` para sanitizar cualquier código de moneda de 3 letras (`COP`, `USD`, `MXN`), mostrando únicamente el símbolo limpio (`$35,000` en lugar de `COP $35,000.00`).
+- **Sufijo Sutil de Moneda (`COP`)**: La etiqueta de moneda de 3 letras (`COP`) se muestra **únicamente en la cifra principal del Total Monthly Spend**, con una tipografía sutil, ligera y gris (`text-apple-tertiary font-light`) al lado del número, idéntica a la imagen de referencia. En el resto del sistema no se muestra ningún código de moneda para evitar la saturación visual.
 - **Remoción Absoluta de Decimales Innecesarios (`.00`)**: Formateo de todos los montos enteros sin decimales (`$218,200` y `$35,000` en lugar de `$218,200.00`), conservando la precisión únicamente en números con centavos reales (ej: `$22.99`).
 - **Sección "Requires Attention" Simplificada**: Rediseño de las alertas a barras ultra limpias en una sola línea con el formato exacto: `Datos Mama $35,000 (In 2 days)`.
 
