@@ -7,7 +7,6 @@ import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
 export async function registerUser(formData: unknown) {
-  await ensureDatabaseReady();
   const result = registerSchema.safeParse(formData);
   if (!result.success) {
     return { error: result.error.errors[0].message };
