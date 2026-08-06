@@ -36,6 +36,7 @@ model Subscription {
   autoRenew            Boolean   @default(true)
   status               String    @default("ACTIVE")
   notes                String?
+  icon                 String?   @default("📦")
   cancelUrl            String?
   cancelSteps          String?
   reminderDays         Int       @default(3)

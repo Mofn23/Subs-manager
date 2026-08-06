@@ -39,6 +39,11 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 - **Remoción Absoluta de Decimales Innecesarios (`.00`)**: Formateo de todos los montos enteros sin decimales (`218,200` y `35,000` en lugar de `218,200.00`), conservando la precisión únicamente en números con centavos reales (ej: `22.99`).
 - **Sección "Requires Attention" Simplificada con Relieve Amarillo Sutil**: Rediseño de las alertas en píldoras con un contorno de relieve amarillo ámbar delicado (`border-amber-300/80`) y un suave resplandor de fondo (`shadow-[0_2px_10px_rgba(251,191,36,0.12)]`), con el formato exacto: `Datos mama $35,000 (In 2 days)`.
 
+#### 7. Emojis de Apple para Suscripciones
+- **Selector de Emoji en el Formulario**: Botón avatar circular `w-16 h-16` en la parte superior central del modal de agregar/editar suscripciones para escoger emojis estilo Apple (🍿, 🎵, 🎬, 🤖, 💻, 📱, ☁️, 🎮, 🏋️‍♂️, ⚡, 🍕, 💳, 🚗, etc.).
+- **Detección e Inferencia Inteligente (Auto-Emoji)**: Sugerencia automática e instantánea del emoji al escribir el nombre de la suscripción (*Netflix* -> 🍿, *Spotify* -> 🎵, *ChatGPT* -> 🤖, *iCloud* -> ☁️, *Movistar* -> 📱, *Gimnasio* -> 🏋️‍♂️).
+- **Íconos en el Dashboard**: Reemplazo de las 2 letras iniciales dentro del círculo avatar de cada tarjeta por el emoji seleccionado, conservando exactamente la forma, tamaño y estética de la tarjeta.
+
 ---
 
 ## [v1.0.0] - 2026-08-05 (MVP Initial Release) - COMPLETADO ✅

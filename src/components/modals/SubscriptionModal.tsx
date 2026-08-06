@@ -1,11 +1,11 @@
 "use client";
 
 import { createSubscription, updateSubscription } from "@/app/actions/subscriptions";
-import { SubscriptionItem } from "@/lib/financials";
+import { getAutoEmoji, SubscriptionItem } from "@/lib/financials";
 import { subscriptionSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,8 +17,18 @@ interface SubscriptionModalProps {
   currency: string;
 }
 
+const PRESET_EMOJIS = [
+  "🍿", "🎬", "🎵", "🎧", "📺", "🎮", "🕹️",
+  "🤖", "💻", "📱", "☁️", "⚡", "🛡️", "🏋️‍♂️",
+  "🚴‍♂️", "☕", "🍕", "🚗", "📚", "💳", "💰",
+  "💼", "📊", "💧", "🔑", "🎨", "📦", "🔊"
+];
+
 export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currency }: SubscriptionModalProps) {
   const [errorMsg, setErrorMsg] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState("🍿");
+  const [hasCustomIcon, setHasCustomIcon] = useState(false);
 
   const categories = [
     "Streaming",
@@ -36,13 +46,14 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
     provider: "",
     category: "Streaming",
     price: 9.99,
-    billingCycle: "MONTHLY" as const,
+    billingCycle: "MONTHLY" as "WEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY" | "CUSTOM",
     customIntervalMonths: 1,
     nextRenewalDate: format(new Date(), "yyyy-MM-dd"),
     trialEndDate: "",
     autoRenew: true,
-    status: "ACTIVE" as const,
+    status: "ACTIVE" as "ACTIVE" | "PAUSED" | "TO_CANCEL" | "CANCELLED" | "VERIFIED_CANCELLED" | "TRIAL" | "EXPIRED",
     notes: "",
+    icon: "🍿",
     cancelUrl: "",
     cancelSteps: "",
     reminderDays: 3,
@@ -63,9 +74,15 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
 
   const watchCycle = watch("billingCycle");
   const watchStatus = watch("status");
+  const watchName = watch("name");
+  const watchCategory = watch("category");
 
   useEffect(() => {
     if (subscriptionToEdit) {
+      const initialIcon = subscriptionToEdit.icon || getAutoEmoji(subscriptionToEdit.name, subscriptionToEdit.category);
+      setSelectedIcon(initialIcon);
+      setHasCustomIcon(Boolean(subscriptionToEdit.icon));
+
       reset({
         name: subscriptionToEdit.name,
         provider: subscriptionToEdit.provider,
@@ -82,6 +99,7 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
         autoRenew: subscriptionToEdit.autoRenew,
         status: (subscriptionToEdit.status as any) || "ACTIVE",
         notes: (subscriptionToEdit as any).notes || "",
+        icon: initialIcon,
         cancelUrl: (subscriptionToEdit as any).cancelUrl || "",
         cancelSteps: (subscriptionToEdit as any).cancelSteps || "",
         reminderDays: (subscriptionToEdit as any).reminderDays || 3,
@@ -89,8 +107,19 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
       });
     } else {
       reset(defaultValues);
+      setSelectedIcon("🍿");
+      setHasCustomIcon(false);
     }
   }, [subscriptionToEdit, isOpen]);
+
+  // Auto-suggest emoji based on typing subscription name
+  useEffect(() => {
+    if (!hasCustomIcon && !subscriptionToEdit) {
+      const auto = getAutoEmoji(watchName, watchCategory);
+      setValue("icon", auto);
+      setSelectedIcon(auto);
+    }
+  }, [watchName, watchCategory, hasCustomIcon, subscriptionToEdit, setValue]);
 
   if (!isOpen) return null;
 
@@ -140,6 +169,60 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
               {errorMsg}
             </div>
           )}
+
+          {/* Top Center Circular Avatar Emoji Picker */}
+          <div className="flex flex-col items-center justify-center pt-1 pb-2">
+            <button
+              type="button"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              className="w-16 h-16 rounded-3xl bg-apple-bg hover:bg-apple-border/50 border border-apple-border shadow-sm flex items-center justify-center text-3xl transition-transform active:scale-95 relative group"
+              title="Choose Emoji Icon"
+            >
+              {selectedIcon || "📦"}
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] shadow-sm border border-white group-hover:scale-110 transition-transform">
+                <Sparkles className="w-3 h-3" />
+              </div>
+            </button>
+            <span className="text-[11px] text-apple-tertiary mt-1.5 font-medium">
+              Tap circle to choose emoji
+            </span>
+
+            {/* Apple Style Emoji Selector Popup Grid */}
+            {showEmojiPicker && (
+              <div className="w-full mt-3 p-3 bg-apple-bg border border-apple-border rounded-2xl animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between text-xs font-semibold text-apple-secondary mb-2 px-1">
+                  <span>Select Apple Emoji</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(false)}
+                    className="text-apple-tertiary hover:text-apple-text text-[11px]"
+                  >
+                    Close ✕
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-7 gap-1.5 max-h-36 overflow-y-auto p-1 bg-white rounded-xl border border-apple-border">
+                  {PRESET_EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => {
+                        setValue("icon", emoji);
+                        setSelectedIcon(emoji);
+                        setHasCustomIcon(true);
+                        setShowEmojiPicker(false);
+                      }}
+                      className={`w-9 h-9 text-xl rounded-xl flex items-center justify-center hover:bg-black/5 transition-transform active:scale-90 ${
+                        selectedIcon === emoji ? "bg-blue-100 ring-2 ring-blue-500/40" : ""
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Name & Provider */}
           <div className="grid grid-cols-2 gap-3">
@@ -200,9 +283,9 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
               <label className="block text-xs font-medium text-apple-secondary mb-1">Price ({currency})</label>
               <input
                 type="number"
-                step="0.01"
+                step="any"
                 {...register("price")}
-                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text font-semibold"
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
               />
               {errors.price && <p className="text-[10px] text-apple-danger mt-1">{errors.price.message as string}</p>}
             </div>
@@ -213,16 +296,29 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
                 {...register("billingCycle")}
                 className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
               >
-                <option value="MONTHLY">Monthly</option>
-                <option value="YEARLY">Yearly</option>
                 <option value="WEEKLY">Weekly</option>
-                <option value="QUARTERLY">Quarterly (3 mos)</option>
+                <option value="MONTHLY">Monthly</option>
+                <option value="QUARTERLY">Quarterly</option>
+                <option value="YEARLY">Yearly</option>
                 <option value="CUSTOM">Custom Interval</option>
               </select>
             </div>
           </div>
 
-          {/* Dates */}
+          {/* Custom Interval Months (Only if CUSTOM) */}
+          {watchCycle === "CUSTOM" && (
+            <div>
+              <label className="block text-xs font-medium text-apple-secondary mb-1">Interval (Months)</label>
+              <input
+                type="number"
+                min="1"
+                {...register("customIntervalMonths")}
+                className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
+              />
+            </div>
+          )}
+
+          {/* Renewal & Trial Dates */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-apple-secondary mb-1">Next Renewal Date</label>
@@ -231,10 +327,15 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
                 {...register("nextRenewalDate")}
                 className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
               />
+              {errors.nextRenewalDate && (
+                <p className="text-[10px] text-apple-danger mt-1">{errors.nextRenewalDate.message as string}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-apple-secondary mb-1">Trial End Date (Optional)</label>
+              <label className="block text-xs font-medium text-apple-secondary mb-1">
+                {watchStatus === "TRIAL" ? "Trial Expiry Date *" : "Trial Expiry Date (Optional)"}
+              </label>
               <input
                 type="date"
                 {...register("trialEndDate")}
@@ -243,43 +344,29 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
             </div>
           </div>
 
-          {/* Direct Cancel Link & Notes */}
+          {/* Cancellation Portal Link */}
           <div>
-            <label className="block text-xs font-medium text-apple-secondary mb-1">Cancellation Link (URL)</label>
+            <label className="block text-xs font-medium text-apple-secondary mb-1">Direct Cancel URL (Optional)</label>
             <input
-              type="url"
               {...register("cancelUrl")}
-              placeholder="https://provider.com/account/cancel"
+              placeholder="https://..."
               className="w-full px-3.5 py-2 rounded-xl bg-apple-bg border border-apple-border text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text"
             />
           </div>
 
-          {/* Low usage toggle */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-apple-bg border border-apple-border">
-            <div>
-              <div className="text-xs font-medium text-apple-text">Flag for Review / Low Usage</div>
-              <div className="text-[11px] text-apple-tertiary">Include in optimization & potential savings detector</div>
-            </div>
-            <input
-              type="checkbox"
-              {...register("flaggedLowUsage")}
-              className="w-4 h-4 rounded text-blue-500 focus:ring-blue-400 border-gray-300"
-            />
-          </div>
-
-          {/* Modal Actions */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-apple-border">
+          {/* Footer Buttons */}
+          <div className="pt-4 flex items-center justify-end gap-2 border-t border-apple-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-apple-bg text-apple-secondary text-xs font-medium hover:bg-black/5 transition"
+              className="px-4 py-2 rounded-xl text-xs font-medium text-apple-secondary hover:text-apple-text transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl bg-apple-text text-white text-xs font-medium hover:opacity-90 transition shadow-sm disabled:opacity-50"
+              className="px-5 py-2 rounded-xl text-xs font-medium bg-apple-text text-white hover:bg-black/80 transition shadow-apple disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : subscriptionToEdit ? "Save Changes" : "Create Subscription"}
             </button>

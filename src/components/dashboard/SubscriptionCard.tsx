@@ -1,7 +1,7 @@
 "use client";
 
 import { toggleLowUsageFlag, updateSubscriptionStatus } from "@/app/actions/subscriptions";
-import { calculateMonthlyEquivalent, formatCurrency, getDaysUntil, SubscriptionItem } from "@/lib/financials";
+import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
 import { AlertCircle, Calendar, ExternalLink, Flag, MoreVertical, Edit2, Trash2, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
@@ -58,8 +58,8 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
       <div className="flex items-start justify-between gap-4">
         {/* Left: Icon & Name */}
         <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-apple-bg flex items-center justify-center font-bold text-apple-text text-sm border border-apple-border group-hover:scale-105 transition-transform shrink-0">
-            {subscription.name.substring(0, 2).toUpperCase()}
+          <div className="w-10 h-10 rounded-2xl bg-apple-bg flex items-center justify-center text-xl border border-apple-border group-hover:scale-105 transition-transform shrink-0 shadow-sm">
+            {subscription.icon || getAutoEmoji(subscription.name, subscription.category)}
           </div>
           <div>
             <div className="flex items-center gap-2">

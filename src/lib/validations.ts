@@ -25,6 +25,7 @@ export const subscriptionSchema = z.object({
     .enum(["ACTIVE", "PAUSED", "TO_CANCEL", "CANCELLED", "VERIFIED_CANCELLED", "TRIAL", "EXPIRED"])
     .default("ACTIVE"),
   notes: z.string().optional().nullable(),
+  icon: z.string().optional().nullable(),
   cancelUrl: z.string().optional().nullable(),
   cancelSteps: z.string().optional().nullable(),
   reminderDays: z.coerce.number().default(3),

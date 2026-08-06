@@ -16,9 +16,43 @@ export interface SubscriptionItem {
   status: string;
   flaggedLowUsage: boolean;
   notes?: string | null;
+  icon?: string | null;
   cancelUrl?: string | null;
   cancelSteps?: string | null;
   reminderDays?: number;
+}
+
+/**
+ * Returns a smart matching Apple-style emoji based on subscription name or category.
+ */
+export function getAutoEmoji(name: string = "", category: string = ""): string {
+  const query = `${name} ${category}`.toLowerCase();
+
+  if (query.includes("netflix") || query.includes("prime") || query.includes("hbo") || query.includes("disney") || query.includes("movie") || query.includes("film")) return "🍿";
+  if (query.includes("spotify") || query.includes("music") || query.includes("audio") || query.includes("tidal") || query.includes("deezer") || query.includes("song")) return "🎵";
+  if (query.includes("youtube") || query.includes("video") || query.includes("tv")) return "📺";
+  if (query.includes("chatgpt") || query.includes("openai") || query.includes("claude") || query.includes("midjourney") || query.includes("ai")) return "🤖";
+  if (query.includes("cloud") || query.includes("drive") || query.includes("dropbox") || query.includes("storage")) return "☁️";
+  if (query.includes("playstation") || query.includes("xbox") || query.includes("game") || query.includes("nintendo") || query.includes("steam")) return "🎮";
+  if (query.includes("gym") || query.includes("fitness") || query.includes("workout") || query.includes("health") || query.includes("sport")) return "🏋️‍♂️";
+  if (query.includes("movistar") || query.includes("claro") || query.includes("tigo") || query.includes("datos") || query.includes("phone") || query.includes("celular") || query.includes("mobile")) return "📱";
+  if (query.includes("electric") || query.includes("luz") || query.includes("energy") || query.includes("power") || query.includes("servicio")) return "⚡";
+  if (query.includes("agua") || query.includes("water")) return "💧";
+  if (query.includes("github") || query.includes("adobe") || query.includes("figma") || query.includes("code") || query.includes("software")) return "💻";
+  if (query.includes("car") || query.includes("uber") || query.includes("auto")) return "🚗";
+  if (query.includes("book") || query.includes("kindle") || query.includes("read")) return "📚";
+  if (query.includes("rappi") || query.includes("ubereats") || query.includes("food") || query.includes("comida")) return "🍕";
+  if (query.includes("bank") || query.includes("tarjeta") || query.includes("card")) return "💳";
+
+  const cat = (category || "").toLowerCase();
+  if (cat.includes("stream")) return "🍿";
+  if (cat.includes("ai") || cat.includes("tech")) return "🤖";
+  if (cat.includes("product")) return "💻";
+  if (cat.includes("fit")) return "🏋️‍♂️";
+  if (cat.includes("game")) return "🎮";
+  if (cat.includes("util")) return "⚡";
+
+  return "📦";
 }
 
 /**
