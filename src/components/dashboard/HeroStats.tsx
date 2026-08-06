@@ -1,7 +1,7 @@
 "use client";
 
 import { formatCurrency } from "@/lib/financials";
-import { ArrowUpRight, TrendingDown, Wallet } from "lucide-react";
+import { ArrowUpRight, TrendingDown } from "lucide-react";
 import Link from "next/link";
 
 interface HeroStatsProps {
@@ -19,48 +19,45 @@ export function HeroStats({
   currency,
   monthlyBudget,
   potentialMonthlySavings = 0,
-  activeCount,
 }: HeroStatsProps) {
   const hasBudget = Boolean(monthlyBudget && monthlyBudget > 0);
   const budgetRatio = hasBudget ? (monthlyTotal / (monthlyBudget as number)) * 100 : 0;
   const isOverBudget = hasBudget ? monthlyTotal > (monthlyBudget as number) : false;
 
+  const currencyCode = currency && currency.trim() ? currency.trim().toUpperCase() : "COP";
+
   return (
     <div className="space-y-4">
-      {/* Main Glass/White Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-apple-border shadow-apple transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-apple-border">
-          {/* Monthly Spend */}
-          <div>
-            <div className="flex items-center gap-2 text-apple-secondary text-xs font-medium uppercase tracking-wider mb-1">
-              <Wallet className="w-3.5 h-3.5 text-apple-tertiary" />
-              Total Monthly Spend
-            </div>
-            <div className="flex items-baseline gap-3">
-              <h1 className="text-3xl sm:text-4xl font-semibold text-apple-text tracking-tight flex items-baseline gap-1.5">
-                <span>{formatCurrency(monthlyTotal, currency)}</span>
-                <span className="text-sm sm:text-base font-light text-apple-tertiary tracking-normal">
-                  {currency && currency.trim() ? currency.trim().toUpperCase() : "COP"}
-                </span>
-              </h1>
-              <span className="text-xs text-apple-tertiary font-normal">/ month across {activeCount} subs</span>
-            </div>
-          </div>
+      {/* Main Ultra-Minimal Centered Hero Card */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-apple-border shadow-apple transition-all flex flex-col items-center justify-center text-center">
+        {/* Small Centered Gray Title */}
+        <div className="text-xs font-medium uppercase tracking-wider text-apple-tertiary mb-1">
+          Total Monthly Spend
+        </div>
 
-          {/* Annualized Projection */}
-          <div className="sm:text-right border-t sm:border-t-0 pt-4 sm:pt-0 border-apple-border">
-            <div className="text-apple-secondary text-xs font-medium uppercase tracking-wider mb-1">
-              Projected Annual Cost
-            </div>
-            <div className="text-xl sm:text-2xl font-medium text-apple-text tracking-tight">
-              {formatCurrency(annualTotal, currency)}
-            </div>
-          </div>
+        {/* Predominant Big Bold Main Value + Subtle COP */}
+        <div className="flex items-baseline justify-center gap-1.5 my-1">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-apple-text tracking-tight">
+            {formatCurrency(monthlyTotal, currency)}
+          </h1>
+          <span className="text-base sm:text-lg font-light text-apple-tertiary tracking-normal">
+            {currencyCode}
+          </span>
+        </div>
+
+        {/* Small Annual Value directly underneath */}
+        <div className="flex items-baseline justify-center gap-1 text-xs sm:text-sm font-medium text-apple-tertiary mt-0.5">
+          <span>{formatCurrency(annualTotal, currency)}</span>
+          <span className="font-light">Annual</span>
         </div>
 
         {/* Conditional Bottom Bar: Only renders budget if budget is set, and/or potential savings */}
         {(hasBudget || potentialMonthlySavings > 0) && (
-          <div className={`pt-6 grid grid-cols-1 ${hasBudget ? "md:grid-cols-2" : "grid-cols-1"} gap-6`}>
+          <div
+            className={`w-full pt-6 border-t border-apple-border mt-6 grid grid-cols-1 ${
+              hasBudget ? "md:grid-cols-2" : "grid-cols-1"
+            } gap-6 text-left`}
+          >
             {/* Monthly Budget Tracker (Hidden completely if budget is empty/null/0) */}
             {hasBudget && (
               <div>
