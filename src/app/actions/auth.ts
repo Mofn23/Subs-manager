@@ -1,7 +1,7 @@
 "use server";
 
 import { getCurrentUser } from "@/lib/auth";
-import { ensureDatabaseReady, prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { onboardingSchema, registerSchema, userSettingsSchema } from "@/lib/validations";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
