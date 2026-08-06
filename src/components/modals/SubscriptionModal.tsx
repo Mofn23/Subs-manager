@@ -6,6 +6,7 @@ import { subscriptionSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -93,19 +94,26 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
 
   if (!isOpen) return null;
 
+  const router = useRouter();
+
   const onSubmit = async (data: any) => {
     setErrorMsg("");
-    let res;
-    if (subscriptionToEdit) {
-      res = await updateSubscription(subscriptionToEdit.id, data);
-    } else {
-      res = await createSubscription(data);
-    }
+    try {
+      let res;
+      if (subscriptionToEdit) {
+        res = await updateSubscription(subscriptionToEdit.id, data);
+      } else {
+        res = await createSubscription(data);
+      }
 
-    if (res.error) {
-      setErrorMsg(res.error);
-    } else {
-      onClose();
+      if (res?.error) {
+        setErrorMsg(res.error);
+      } else {
+        router.refresh();
+        onClose();
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "An unexpected error occurred.");
     }
   };
 

@@ -4,6 +4,27 @@ Documento oficial de registro de versiones, cambios, nuevas funciones, mejoras d
 
 ---
 
+## [v1.1.0] - 2026-08-05 (Cloud Persistence, GitHub & iOS PWA Release) - COMPLETADO ✅
+
+### 🌟 Visión del Release
+Integración con **Vercel Postgres** para sincronización multi-dispositivo en tiempo real (móvil, PC y tablets), empaquetado de PWA y configuración del flujo de integración continua GitHub Actions para la generación del ejecutable `.ipa` de iOS para Sideloadly.
+
+### ✨ Funcionalidades y Mejoras
+
+#### 1. Sincronización Multi-Dispositivo Permanente en la Nube
+- **Migración a PostgreSQL**: Configuración de `POSTGRES_PRISMA_DATABASE_URL` para almacenamiento persistente de datos en Vercel Postgres.
+- **Sincronización en Tiempo Real**: Los datos creados o modificados en la PWA del iPhone se reflejan al instante en cualquier navegador de PC o tablet.
+
+#### 2. Publicación en GitHub y CI/CD de iOS
+- **Repositorio Oficial**: Código fuente publicado en `https://github.com/Mofn23/Subs-manager.git`.
+- **Compilación Automatizada `.ipa`**: Workflow en GitHub Actions (`.github/workflows/build-ios.yml`) ejecutado en runners de macOS para empaquetar la app iOS e instalarla mediante Sideloadly.
+
+#### 3. Reactividad y Manejo de Errores
+- **Manejo Robusto de Excepciones**: Bloques `try/catch` envolventes en Server Actions de suscripciones con mensajes de error amigables al usuario.
+- **Refresco Automático de Interfaz**: Invocación de `router.refresh()` cliente al crear, actualizar o eliminar suscripciones para actualización instantánea del Dashboard.
+
+---
+
 ## [v1.0.0] - 2026-08-05 (MVP Initial Release) - COMPLETADO ✅
 
 ### 🌟 Visión del Release
