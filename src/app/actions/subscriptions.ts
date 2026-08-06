@@ -3,6 +3,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { subscriptionSchema } from "@/lib/validations";
+import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
 export async function createSubscription(formData: unknown) {
@@ -10,6 +11,31 @@ export async function createSubscription(formData: unknown) {
     const user = await getCurrentUser();
     if (!user || !user.id) {
       return { error: "Session expired. Please log in again." };
+    }
+
+    let dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+    });
+
+    if (!dbUser && user.email) {
+      dbUser = await prisma.user.findUnique({
+        where: { email: user.email.toLowerCase() },
+      });
+    }
+
+    if (!dbUser) {
+      const hashedPassword = await bcrypt.hash("demo1234", 10);
+      dbUser = await prisma.user.create({
+        data: {
+          id: user.id,
+          name: user.name || "User",
+          email: (user.email || "user@subsmanager.app").toLowerCase(),
+          password: hashedPassword,
+          currency: user.currency || "$",
+          monthlyBudget: user.monthlyBudget || 150.0,
+          onboarded: true,
+        },
+      });
     }
 
     const result = subscriptionSchema.safeParse(formData);
@@ -21,7 +47,7 @@ export async function createSubscription(formData: unknown) {
 
     const subscription = await prisma.subscription.create({
       data: {
-        userId: user.id,
+        userId: dbUser.id,
         name: data.name,
         provider: data.provider,
         category: data.category,

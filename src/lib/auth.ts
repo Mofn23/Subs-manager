@@ -22,9 +22,23 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
           where: { email: credentials.email.toLowerCase() },
         });
+
+        if (!user && credentials.email.toLowerCase() === "demo@subsmanager.app" && credentials.password === "demo1234") {
+          const hashedPassword = await bcrypt.hash("demo1234", 10);
+          user = await prisma.user.create({
+            data: {
+              name: "Alex Morgan",
+              email: "demo@subsmanager.app",
+              password: hashedPassword,
+              currency: "$",
+              monthlyBudget: 150.0,
+              onboarded: true,
+            },
+          });
+        }
 
         if (!user) {
           throw new Error("No account found with this email");
