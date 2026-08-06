@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  password      String
+  currency      String         @default("$")
+  monthlyBudget Float?
+  onboarded     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+  notifications Notification[]
+}
+
+model Subscription {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  provider          String
+  category          String    @default("Other")
+  price             Float
+  billingCycle      String    @default("MONTHLY") // WEEKLY, MONTHLY, QUARTERLY, YEARLY, CUSTOM
+  customIntervalMonths Int?   @default(1)
+  nextRenewalDate   DateTime
+  trialEndDate      DateTime?
+  autoRenew         Boolean   @default(true)
+  status            String    @default("ACTIVE") // ACTIVE, PAUSED, TO_CANCEL, CANCELLED, VERIFIED_CANCELLED, TRIAL, EXPIRED
+  notes             String?
+  cancelUrl         String?
+  cancelSteps       String?
+  reminderDays      Int       @default(3)
+  flaggedLowUsage   Boolean   @default(false)
+  canceledAt        DateTime?
+  verifiedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO") // RENEWAL, TRIAL_EXPIRING, BUDGET_EXCEEDED, LEAK_ALERT, INFO
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}

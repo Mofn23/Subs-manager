@@ -1,0 +1,16 @@
+{
+  "name": "Subs Manager",
+  "short_name": "SubsManager",
+  "description": "Apple-inspired personal and family subscription manager.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF9",
+  "theme_color": "#FAFAF9",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

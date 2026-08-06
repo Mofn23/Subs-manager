@@ -1,0 +1,9 @@
+{
+  "appId": "app.subsmanager.app",
+  "appName": "Subs Manager",
+  "webDir": "out",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

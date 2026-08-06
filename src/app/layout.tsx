@@ -1,0 +1,51 @@
+import { Providers } from "@/components/common/Providers";
+import { Navbar } from "@/components/layout/Navbar";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Subs Manager - Calm, Apple-inspired Subscription Tracker",
+  description:
+    "Ultraminimal personal & family subscription management. Direct renewal timeline, cost annualization, trial tracking, leak detection, and cancellation workflow.",
+  manifest: "/manifest.json",
+};
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let notifications: any[] = [];
+
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      notifications = await prisma.notification.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      });
+    }
+  } catch (e) {
+    // Silently handle static generation build pass
+  }
+
+  return (
+    <html lang="en">
+      <body className="min-h-screen flex flex-col bg-apple-bg text-apple-text antialiased selection:bg-blue-100 selection:text-blue-900">
+        <Providers>
+          <Navbar notifications={notifications} />
+          <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+            {children}
+          </main>
+          <footer className="border-t border-apple-border py-6 text-center text-xs text-apple-tertiary">
+            <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+              <span>Subs Manager • Designed with Apple HIG minimalism</span>
+              <span>100% Private • Local Data Sovereignty</span>
+            </div>
+          </footer>
+        </Providers>
+      </body>
+    </html>
+  );
+}
