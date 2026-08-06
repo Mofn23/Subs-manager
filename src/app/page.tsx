@@ -1,11 +1,12 @@
 import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { ensureDatabaseReady, prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { DashboardView } from "./DashboardView";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  await ensureDatabaseReady();
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");

@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { ensureDatabaseReady, prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { AuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -18,6 +18,8 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        await ensureDatabaseReady();
+
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid email or password");
         }

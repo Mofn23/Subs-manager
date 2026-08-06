@@ -1,12 +1,13 @@
 "use server";
 
 import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { ensureDatabaseReady, prisma } from "@/lib/prisma";
 import { onboardingSchema, registerSchema, userSettingsSchema } from "@/lib/validations";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
 export async function registerUser(formData: unknown) {
+  await ensureDatabaseReady();
   const result = registerSchema.safeParse(formData);
   if (!result.success) {
     return { error: result.error.errors[0].message };
