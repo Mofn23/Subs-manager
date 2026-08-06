@@ -1,11 +1,22 @@
 "use client";
 
 import { clearAllNotifications, markNotificationAsRead } from "@/app/actions/notifications";
-import { Bell, Calendar, Check, CreditCard, LogOut, PieChart, ShieldAlert, Sparkles, Settings } from "lucide-react";
+import {
+  Bell,
+  Calendar,
+  Check,
+  ChevronDown,
+  CreditCard,
+  LogOut,
+  PieChart,
+  Settings,
+  ShieldAlert,
+  Sparkles,
+} from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface NotificationItem {
   id: string;
@@ -21,11 +32,29 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
   const { data: session } = useSession();
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notifList, setNotifList] = useState(notifications);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setNotifList(notifications);
   }, [notifications]);
+
+  // Click outside handlers
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const unreadCount = notifList.filter((n) => !n.read).length;
 
@@ -47,53 +76,81 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
     { label: "Settings", href: "/settings", icon: Settings },
   ];
 
+  const activeLink = navLinks.find((link) => link.href === pathname) || navLinks[0];
+  const ActiveIcon = activeLink.icon;
+
   return (
-    <header className="sticky top-0 z-40 bg-apple-bg/80 backdrop-blur-md border-b border-apple-border transition-all">
+    <header className="sticky top-0 z-40 bg-apple-bg/80 backdrop-blur-xl border-b border-apple-border transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Brand */}
+        {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
             <Sparkles className="w-4 h-4" />
           </div>
-          <span className="font-semibold text-apple-text tracking-tight text-lg">
+          <span className="font-semibold text-apple-text tracking-tight text-base sm:text-lg">
             Subs<span className="font-normal text-apple-secondary">Manager</span>
           </span>
         </Link>
 
-        {/* Navigation Tabs */}
+        {/* Minimal Single-Button Glassmorphism Menu Selector */}
         {session?.user && (
-          <nav className="hidden md:flex items-center gap-1 bg-black/5 p-1 rounded-2xl border border-apple-border">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                    isActive
-                      ? "bg-white text-apple-text shadow-apple"
-                      : "text-apple-secondary hover:text-apple-text hover:bg-white/50"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/5 hover:bg-black/10 border border-apple-border text-xs font-semibold text-apple-text backdrop-blur-md transition-all shadow-sm active:scale-95"
+              aria-label="Toggle navigation menu"
+            >
+              <ActiveIcon className="w-3.5 h-3.5 text-blue-500" />
+              <span className="text-apple-text">{activeLink.label}</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-apple-secondary transition-transform duration-200 ${
+                  isMenuOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {/* Apple Glassmorphism Dropdown Menu */}
+            {isMenuOpen && (
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 bg-neutral-900/90 backdrop-blur-2xl border border-white/15 shadow-2xl rounded-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-white">
+                <div className="space-y-0.5">
+                  {navLinks.map((link) => {
+                    const Icon = link.icon;
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all ${
+                          isActive
+                            ? "bg-white/15 text-white font-semibold"
+                            : "text-white/70 hover:bg-white/10 hover:text-white font-normal"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Icon className={`w-4 h-4 ${isActive ? "text-blue-400" : "text-white/60"}`} />
+                          <span>{link.label}</span>
+                        </div>
+                        {isActive && <Check className="w-4 h-4 text-blue-400" />}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Right Actions */}
         {session?.user ? (
-          <div className="flex items-center gap-3">
-            {/* Currency indicator */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Currency badge */}
             <div className="hidden sm:flex items-center px-2.5 py-1 rounded-xl bg-apple-accent-soft text-apple-accent text-xs font-medium border border-blue-100">
               {session.user.currency} Base Currency
             </div>
 
             {/* Notification Bell */}
-            <div className="relative">
+            <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative p-2 rounded-xl text-apple-secondary hover:text-apple-text hover:bg-white/80 transition-all border border-transparent hover:border-apple-border"
@@ -183,28 +240,6 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
           </Link>
         )}
       </div>
-
-      {/* Mobile Nav Bar */}
-      {session?.user && (
-        <div className="md:hidden flex items-center justify-around border-t border-apple-border bg-white px-2 py-2">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex flex-col items-center gap-1 text-[10px] font-medium py-1 px-3 rounded-xl transition-all ${
-                  isActive ? "text-apple-accent font-semibold" : "text-apple-secondary hover:text-apple-text"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {link.label}
-              </Link>
-            );
-          })}
-        </div>
-      )}
     </header>
   );
 }

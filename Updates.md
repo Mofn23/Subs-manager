@@ -23,6 +23,11 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 - **Manejo Robusto de Excepciones**: Bloques `try/catch` envolventes en Server Actions de suscripciones con mensajes de error amigables al usuario.
 - **Refresco Automático de Interfaz**: Invocación de `router.refresh()` cliente al crear, actualizar o eliminar suscripciones para actualización instantánea del Dashboard.
 
+#### 4. Rediseño Ultraminimalista Apple Glassmorphism de la Barra de Navegación
+- **Eliminación del Desastre Visual**: Se eliminaron las barras de 5 pestañas saturadas tanto en escritorio como en móvil.
+- **Botón Único selector estilo Apple**: Botón flotante tipo píldora con efecto cristal (`Dashboard ˅`) que muestra la vista activa actual.
+- **Menú Desplegable Flotante Translúcido**: Menú emergente con estética **Apple Glassmorphism** (`backdrop-blur-2xl`, bordes suaves, fondo translúcido oscuro, checklist `✓` de elemento activo e íconos alineados).
+
 ---
 
 ## [v1.0.0] - 2026-08-05 (MVP Initial Release) - COMPLETADO ✅
