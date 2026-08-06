@@ -35,7 +35,7 @@ Integración con **Vercel Postgres** para sincronización multi-dispositivo en t
 #### 6. Depuración Visual y Formateo Ultraminimalista
 - **Logo Único Superior**: Eliminación del nombre `SubsManager` en el encabezado superior izquierdo, dejando únicamente el ícono del logo.
 - **Rediseño Centrado del Hero Card**: Alineación centrada del total mensual con una cifra prominente y en negrita (`text-5xl font-extrabold`), eliminación del texto innecesario `month across subs`, y adición del gasto anual justo debajo de forma sutil (`2,618,400 Annual`).
-- **Sufijo Sutil de Moneda (`COP`) sin Símbolo `$`**: La cifra del gasto mensual se muestra como número puro sin el símbolo `$` (`218,200 COP`), con el sufijo `COP` sutil y gris a la derecha idéntico a la imagen de referencia.
+- **Sanitización del Código de Moneda (`COP`)**: Filtrado automático de la cadena de moneda almacenada en base de datos (`COP $` -> `COP`) mediante `replace(/[^a-zA-Z]/g, "")`, garantizando la remoción absoluta del símbolo `$` al lado de `COP` en la tarjeta principal (`218,200 COP`).
 - **Remoción Absoluta de Decimales Innecesarios (`.00`)**: Formateo de todos los montos enteros sin decimales (`218,200` y `35,000` en lugar de `218,200.00`), conservando la precisión únicamente en números con centavos reales (ej: `22.99`).
 - **Sección "Requires Attention" Simplificada con Relieve Amarillo Sutil**: Rediseño de las alertas en píldoras con un contorno de relieve amarillo ámbar delicado (`border-amber-300/80`) y un suave resplandor de fondo (`shadow-[0_2px_10px_rgba(251,191,36,0.12)]`), con el formato exacto: `Datos mama $35,000 (In 2 days)`.
 

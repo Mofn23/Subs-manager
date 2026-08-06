@@ -24,7 +24,13 @@ export function HeroStats({
   const budgetRatio = hasBudget ? (monthlyTotal / (monthlyBudget as number)) * 100 : 0;
   const isOverBudget = hasBudget ? monthlyTotal > (monthlyBudget as number) : false;
 
-  const currencyCode = currency && currency.trim() ? currency.trim().toUpperCase() : "COP";
+  const cleanCurrencyCode = (rawCurrency: string) => {
+    if (!rawCurrency) return "COP";
+    const lettersOnly = rawCurrency.replace(/[^a-zA-Z]/g, "").trim().toUpperCase();
+    return lettersOnly || "COP";
+  };
+
+  const currencyCode = cleanCurrencyCode(currency);
 
   const formatNumberOnly = (amount: number) => {
     const num = Number(amount || 0);
