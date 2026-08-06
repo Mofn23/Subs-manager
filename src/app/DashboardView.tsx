@@ -10,6 +10,7 @@ import { SubscriptionModal } from "@/components/modals/SubscriptionModal";
 import { calculateSpendSummary, detectSubscriptionLeaks, SubscriptionItem } from "@/lib/financials";
 import { Plus, Search, Sparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 interface DashboardViewProps {
