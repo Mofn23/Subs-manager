@@ -1,0 +1,76 @@
+name: Build iOS IPA for SideStore
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build Unsigned iOS IPA
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure web output directory
+        run: mkdir -p out
+
+      - name: Sync Capacitor iOS Project
+        run: npx cap sync ios
+
+      - name: Build Xcode Archive (.xcarchive)
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Package Payload into SubsManager.ipa
+        run: |
+          mkdir -p build/Payload
+          cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
+          cd build
+          zip -r SubsManager.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SubsManager.ipa
+          path: build/SubsManager.ipa
+          retention-days: 30
+
+      - name: Create or Update GitHub Release with IPA
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.1.2-ipa
+          name: Subs Manager iOS Native IPA (v1.1.2)
+          body: |
+            ## 📱 Subs Manager iOS Native IPA Package for SideStore / AltStore
+            
+            This `.ipa` file is compiled automatically for iOS devices.
+            
+            ### 📥 Installation via SideStore / AltStore:
+            1. Download `SubsManager.ipa` on your iPhone.
+            2. Open **SideStore** or **AltStore**.
+            3. Tap the **+** (Add) button and select `SubsManager.ipa`.
+            4. Enjoy Subs Manager running natively on your iOS device!
+          files: build/SubsManager.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

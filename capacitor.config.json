@@ -1,9 +1,15 @@
 {
-  "appId": "app.subsmanager.app",
+  "appId": "com.mofn23.subsmanager",
   "appName": "Subs Manager",
   "webDir": "out",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "https"
+    "url": "https://subs-manager-mofn23s-projects.vercel.app",
+    "cleartext": true
+  },
+  "ios": {
+    "contentInset": "always",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true
   }
 }
