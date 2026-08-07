@@ -10,6 +10,10 @@ jobs:
   build-ios:
     name: Build Unsigned iOS IPA
     runs-on: macos-14
+    env:
+      POSTGRES_PRISMA_DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/dummy?sslmode=disable"
+      POSTGRES_URL_NON_POOLING: "postgresql://postgres:postgres@localhost:5432/dummy?sslmode=disable"
+      NEXTAUTH_SECRET: "dummy_secret_key_1234567890"
 
     steps:
       - name: Checkout repository
@@ -23,6 +27,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
 
       - name: Ensure web output directory
         run: mkdir -p out
