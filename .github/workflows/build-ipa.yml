@@ -10,6 +10,8 @@ jobs:
   build-ios:
     name: Build Unsigned iOS IPA
     runs-on: macos-14
+    permissions:
+      contents: write
     env:
       POSTGRES_PRISMA_DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/dummy?sslmode=disable"
       POSTGRES_URL_NON_POOLING: "postgresql://postgres:postgres@localhost:5432/dummy?sslmode=disable"
