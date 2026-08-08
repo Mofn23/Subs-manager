@@ -3,14 +3,6 @@
   "appName": "Subs Manager",
   "webDir": "out",
   "bundledWebRuntime": false,
-  "server": {
-    "url": "https://subs-manager-mofn23s-projects.vercel.app",
-    "cleartext": true,
-    "allowNavigation": [
-      "subs-manager-mofn23s-projects.vercel.app",
-      "*.vercel.app"
-    ]
-  },
   "ios": {
     "contentInset": "always",
     "allowsLinkPreview": false,
