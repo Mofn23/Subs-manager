@@ -90,11 +90,8 @@ export function Navbar({ notifications = [] }: { notifications?: NotificationIte
   const ActiveIcon = activeLink.icon;
 
   return (
-    <header
-      className="sticky top-0 z-40 bg-apple-bg/80 dark:bg-[#0C0C0E]/80 backdrop-blur-xl border-b border-apple-border dark:border-white/10 transition-all"
-      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-apple-bg/80 dark:bg-[#0C0C0E]/80 backdrop-blur-xl border-b border-apple-border dark:border-white/10 transition-all">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
         {/* Brand Logo - Logo Icon Only */}
         <Link href="/" className="flex items-center group" aria-label="SubsManager Home">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
