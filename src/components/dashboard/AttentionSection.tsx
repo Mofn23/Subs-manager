@@ -1,7 +1,9 @@
 "use client";
 
+import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
+import { MonaiPill } from "@/components/ui/MonaiPill";
 import { markSubscriptionAsPaid } from "@/app/actions/subscriptions";
-import { formatCurrency, getDaysUntil, SubscriptionItem } from "@/lib/financials";
+import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
 import { CheckCircle2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
@@ -39,38 +41,71 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
     return null;
   }
 
-  return (
-    <div className="space-y-2.5">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-apple-secondary dark:text-neutral-400 px-1">
-        Requires Attention
-      </h3>
+  const groupTotal = attentionItems.reduce((acc, item) => acc + item.sub.price, 0);
 
+  return (
+    <div className="space-y-3">
+      {/* MonAI ListGroup Header Pill */}
+      <div className="flex items-center justify-between px-1">
+        <MonaiPill variant="amber" className="text-xs font-black">
+          ⚡ Requires Attention ({attentionItems.length})
+        </MonaiPill>
+
+        <MonaiPill variant="tag" className="text-xs font-bold">
+          7 Days Total: {formatCurrency(groupTotal, currency)}
+        </MonaiPill>
+      </div>
+
+      {/* List Rows */}
       <div className="space-y-2.5">
-        {attentionItems.map(({ sub, daysLeft }) => {
-          const daysText = daysLeft === 0 ? "Today" : `In ${daysLeft} day${daysLeft > 1 ? "s" : ""}`;
+        {attentionItems.map(({ sub, isTrial, daysLeft }) => {
+          const daysText = daysLeft === 0 ? "Renews Today" : `Renews in ${daysLeft}d`;
           const formattedPrice = formatCurrency(sub.price, currency);
+          const icon = sub.icon || getAutoEmoji(sub.name, sub.category);
 
           return (
             <div
               key={sub.id}
-              className="flex items-center justify-between px-5 py-3 rounded-full bg-white dark:bg-[#16161A] border border-amber-300/80 dark:border-amber-400/50 shadow-[0_2px_10px_rgba(251,191,36,0.12)] hover:shadow-[0_4px_14px_rgba(251,191,36,0.22)] transition-all text-xs font-medium text-apple-text dark:text-white"
+              className="flex items-center justify-between p-4 rounded-[24px] bg-[var(--surface)] border border-[var(--amber)]/40 shadow-lg hover:border-[var(--amber)] transition-all gap-3"
             >
-              {/* Ultra-minimal single line with delicate subtle yellow relief pill border */}
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="font-semibold text-apple-text dark:text-white text-sm">{sub.name}</span>
-                <span className="text-apple-secondary dark:text-neutral-400 font-medium">{formattedPrice}</span>
-                <span className="text-apple-tertiary dark:text-neutral-500 font-normal">({daysText})</span>
+              {/* Left: MonAI Avatar & Subscription Details */}
+              <div className="flex items-center gap-3.5 min-w-0">
+                <MonaiAvatar emoji={icon} size="md" isRecurring={true} />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[17px] font-black text-[var(--text-primary)] truncate">
+                      {sub.name}
+                    </span>
+                    <MonaiPill variant="coral" className="text-[11px] py-0.5 px-2">
+                      {isTrial ? "Trial Ending" : daysText}
+                    </MonaiPill>
+                  </div>
+                  <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 truncate">
+                    {sub.provider} • {sub.category}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              {/* Right: Price & 1-Tap [✓ Pagado] Pill Button */}
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-right">
+                  <div className="text-base font-black text-[var(--text-primary)]">
+                    {formattedPrice}
+                  </div>
+                  <div className="text-[11px] font-semibold text-[var(--text-secondary)]">
+                    {sub.billingCycle.toLowerCase()}
+                  </div>
+                </div>
+
                 <button
+                  type="button"
                   onClick={() => handleMarkPaid(sub.id)}
                   disabled={loadingId === sub.id}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/30 transition-all active:scale-95 disabled:opacity-50"
-                  title="Marcar como pagada y reiniciar ciclo de cobro"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--pill-light)] text-[var(--pill-light-text)] text-xs font-extrabold shadow-sm hover:opacity-90 transition-all monai-press active:scale-95 disabled:opacity-50"
+                  title="Marcar como pagada y reiniciar ciclo"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{loadingId === sub.id ? "Guardando..." : "Pagado"}</span>
+                  <CheckCircle2 className="w-4 h-4 text-[var(--green)] stroke-[2.5]" />
+                  <span>{loadingId === sub.id ? "Saving..." : "⊕ Pagado"}</span>
                 </button>
 
                 {sub.cancelUrl && (
@@ -78,9 +113,10 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
                     href={sub.cancelUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-apple-accent hover:underline text-xs flex items-center gap-1 font-medium ml-1"
+                    className="p-2 rounded-full bg-[var(--tag)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                    title="Manage / Cancel"
                   >
-                    Manage <ExternalLink className="w-3 h-3" />
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
               </div>

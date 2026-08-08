@@ -1,8 +1,12 @@
 "use client";
 
 import { markSubscriptionAsPaid, toggleLowUsageFlag, updateSubscriptionStatus } from "@/app/actions/subscriptions";
+import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
+import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
+import { MonaiDropdown, MonaiDropdownItem } from "@/components/ui/MonaiDropdown";
+import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
-import { AlertCircle, Calendar, ExternalLink, Flag, MoreVertical, Edit2, Trash2, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Edit2, Flag, MoreVertical, ShieldAlert, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface SubscriptionCardProps {
@@ -32,24 +36,6 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
     setIsPaidLoading(false);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-apple-success-soft dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-medium">Active</span>;
-      case "TRIAL":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-apple-warning-soft dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-medium">Trial</span>;
-      case "PAUSED":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 font-medium">Paused</span>;
-      case "TO_CANCEL":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 font-medium">To Cancel</span>;
-      case "CANCELLED":
-      case "VERIFIED_CANCELLED":
-        return <span className="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 font-medium line-through">Cancelled</span>;
-      default:
-        return null;
-    }
-  };
-
   const handleToggleFlag = async () => {
     const nextState = !flagged;
     setFlagged(nextState);
@@ -61,152 +47,149 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
     await updateSubscriptionStatus(subscription.id, "TO_CANCEL");
   };
 
+  const getStatusPillVariant = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return "green";
+      case "TRIAL":
+        return "amber";
+      case "TO_CANCEL":
+        return "coral";
+      default:
+        return "tag";
+    }
+  };
+
+  const icon = subscription.icon || getAutoEmoji(subscription.name, subscription.category);
+  const renewalText =
+    daysUntilRenewal < 0
+      ? "Overdue"
+      : daysUntilRenewal === 0
+      ? "Renews Today"
+      : `Renews in ${daysUntilRenewal}d`;
+
+  const menuItems: MonaiDropdownItem[] = [
+    {
+      label: isPaidLoading ? "Reiniciando..." : "Marcar como pagada",
+      icon: <CheckCircle2 className="w-4 h-4 text-[var(--green)]" />,
+      onClick: handleMarkAsPaid,
+      variant: "success",
+      divider: true,
+    },
+    {
+      label: "Edit details",
+      icon: <Edit2 className="w-4 h-4" />,
+      onClick: () => onEdit(subscription),
+    },
+    {
+      label: flagged ? "Unflag review" : "Flag as low usage",
+      icon: <Flag className={`w-4 h-4 ${flagged ? "text-[var(--amber)] fill-[var(--amber)]" : ""}`} />,
+      onClick: handleToggleFlag,
+    },
+    ...(subscription.status !== "TO_CANCEL"
+      ? [
+          {
+            label: "Move to Cancel Center",
+            icon: <ShieldAlert className="w-4 h-4 text-[var(--coral)]" />,
+            onClick: handleMarkToCancel,
+            variant: "warning" as const,
+          },
+        ]
+      : []),
+    {
+      label: "Delete permanently",
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: () => onDelete(subscription.id),
+      variant: "danger",
+      divider: true,
+    },
+  ];
+
   return (
-    <div className="bg-white dark:bg-[#16161A] rounded-2xl p-5 border border-apple-border dark:border-white/10 shadow-apple hover:shadow-apple-hover transition-all group relative">
+    <div className="bg-[var(--surface)] rounded-[28px] p-5 sm:p-6 border border-[var(--border)] shadow-xl hover:shadow-2xl hover:border-white/20 transition-all duration-200 group relative">
       <div className="flex items-start justify-between gap-4">
-        {/* Left: Icon & Name */}
-        <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-apple-bg dark:bg-neutral-800 flex items-center justify-center text-xl border border-apple-border dark:border-white/10 group-hover:scale-105 transition-transform shrink-0 shadow-sm">
-            {subscription.icon || getAutoEmoji(subscription.name, subscription.category)}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-apple-text dark:text-white text-sm">{subscription.name}</h4>
-              {getStatusBadge(subscription.status)}
+        {/* Left: MonAI Avatar 64px + Details */}
+        <div className="flex items-start gap-4 min-w-0">
+          <MonaiAvatar emoji={icon} size="lg" isRecurring={true} />
+
+          <div className="min-w-0 pt-0.5">
+            <span className="text-xs font-bold text-[var(--text-secondary)] block uppercase tracking-wider">
+              {subscription.category}
+            </span>
+
+            <h4 className="text-lg sm:text-xl font-black text-[var(--text-primary)] tracking-tight truncate mt-0.5">
+              {subscription.name}
+            </h4>
+
+            <p className="text-xs font-bold text-[var(--text-secondary)] truncate">
+              {subscription.provider}
+            </p>
+
+            {/* Tag Pills Row (#categoría, #estado, #low_usage) */}
+            <div className="flex items-center gap-1.5 flex-wrap mt-3">
+              <MonaiPill variant={getStatusPillVariant(subscription.status)} className="text-[11px] py-0.5 px-2.5">
+                {subscription.status}
+              </MonaiPill>
+
+              {flagged && (
+                <MonaiPill variant="amber" className="text-[11px] py-0.5 px-2.5">
+                  👻 Low Usage
+                </MonaiPill>
+              )}
             </div>
-            <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">{subscription.provider}</p>
           </div>
         </div>
 
-        {/* Right: Price & Options */}
-        <div className="flex items-start gap-2">
-          <div className="text-right">
-            <div className="font-semibold text-apple-text dark:text-white text-sm">
-              {formatCurrency(subscription.price, currency)}
-            </div>
-            <div className="text-[11px] text-apple-tertiary dark:text-neutral-400">
-              {subscription.billingCycle === "MONTHLY"
+        {/* Right: MonAI AmountPill & Options */}
+        <div className="flex items-start gap-2 shrink-0">
+          <MonaiAmountPill
+            amount={formatCurrency(subscription.price, currency)}
+            prefix="⊖"
+            subtitle={
+              subscription.billingCycle === "MONTHLY"
                 ? "/ month"
-                : `${formatCurrency(monthlyEquivalent, currency)}/mo (${subscription.billingCycle.toLowerCase()})`}
-            </div>
-          </div>
+                : `${formatCurrency(monthlyEquivalent, currency)}/mo (${subscription.billingCycle.toLowerCase()})`
+            }
+          />
 
-          {/* Menu Trigger */}
+          {/* Context Menu Trigger */}
           <div className="relative">
             <button
+              type="button"
               onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 rounded-xl text-apple-tertiary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-apple-bg dark:hover:bg-neutral-800 transition"
+              className="w-10 h-10 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition flex items-center justify-center monai-press active:scale-90"
               aria-label="Options"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
 
-            {/* Context Dropdown */}
-            {showMenu && (
-              <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-[#1C1C22] rounded-xl shadow-apple-modal border border-apple-border dark:border-white/15 py-1.5 z-30 text-xs animate-in fade-in zoom-in-95">
-                <button
-                  onClick={handleMarkAsPaid}
-                  disabled={isPaidLoading}
-                  className="w-full text-left px-3.5 py-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center gap-2 font-medium border-b border-apple-border dark:border-white/10 transition-colors"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                  {isPaidLoading ? "Reiniciando..." : "Marcar como pagada"}
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowMenu(false);
-                    onEdit(subscription);
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-apple-text dark:text-white hover:bg-apple-bg dark:hover:bg-white/10 flex items-center gap-2"
-                >
-                  <Edit2 className="w-3.5 h-3.5 text-apple-secondary dark:text-neutral-400" />
-                  Edit details
-                </button>
-
-                <button
-                  onClick={handleToggleFlag}
-                  className="w-full text-left px-3.5 py-2 text-apple-text dark:text-white hover:bg-apple-bg dark:hover:bg-white/10 flex items-center gap-2"
-                >
-                  <Flag className={`w-3.5 h-3.5 ${flagged ? "text-amber-500 fill-amber-500" : "text-apple-secondary dark:text-neutral-400"}`} />
-                  {flagged ? "Unflag review" : "Flag as low usage"}
-                </button>
-
-                {subscription.status !== "TO_CANCEL" && (
-                  <button
-                    onClick={handleMarkToCancel}
-                    className="w-full text-left px-3.5 py-2 text-rose-600 hover:bg-rose-50 flex items-center gap-2"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5" />
-                    Move to Cancel Center
-                  </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    setShowMenu(false);
-                    onDelete(subscription.id);
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-apple-danger hover:bg-apple-danger-soft flex items-center gap-2 border-t border-apple-border mt-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  Delete permanently
-                </button>
-              </div>
-            )}
+            {/* MonAI Dropdown */}
+            <MonaiDropdown
+              isOpen={showMenu}
+              onClose={() => setShowMenu(false)}
+              items={menuItems}
+            />
           </div>
         </div>
       </div>
 
-      {/* Meta Footer Row */}
-      <div className="mt-4 pt-3 border-t border-apple-border dark:border-white/10 flex items-center justify-between text-xs text-apple-secondary dark:text-neutral-400">
-        {/* Left: Category & Low Usage Pill */}
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-lg bg-apple-bg dark:bg-neutral-800/80 border border-apple-border dark:border-white/10 text-[11px] font-medium text-apple-secondary dark:text-neutral-300">
-            {subscription.category}
-          </span>
-          {flagged && (
-            <span className="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-medium border border-amber-200/60 dark:border-amber-500/30 flex items-center gap-1">
-              <Flag className="w-3 h-3 fill-amber-500 text-amber-500" />
-              Low usage
-            </span>
-          )}
+      {/* Footer Row: Renewal countdown + 1-Tap [✓ Pagado] Pill */}
+      <div className="mt-5 pt-3.5 border-t border-[var(--border-subtle)] flex items-center justify-between gap-2">
+        <div className="text-xs font-extrabold text-[var(--text-secondary)] flex items-center gap-1">
+          <span>🗓</span>
+          <span className={daysUntilRenewal <= 0 ? "text-[var(--coral)]" : ""}>{renewalText}</span>
         </div>
 
-        {/* Right: Renewal & Quick Mark Paid */}
-        <div className="flex items-center gap-2 text-apple-tertiary dark:text-neutral-400 text-[11px]">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>
-              {daysUntilRenewal < 0
-                ? "Overdue"
-                : daysUntilRenewal === 0
-                ? "Renews Today"
-                : `Renews in ${daysUntilRenewal}d`}
-            </span>
-          </div>
-
-          <button
-            onClick={handleMarkAsPaid}
-            disabled={isPaidLoading}
-            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold border border-emerald-500/30 transition-all active:scale-95 disabled:opacity-50 ml-1"
-            title="Marcar como pagada y reiniciar ciclo"
-          >
-            <CheckCircle2 className="w-3 h-3" />
-            <span>{isPaidLoading ? "..." : "Marcar Pagada"}</span>
-          </button>
-          {(subscription as any).cancelUrl && (
-            <a
-              href={(subscription as any).cancelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1 hover:text-apple-text dark:hover:text-white transition"
-              title="Official Cancellation URL"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={handleMarkAsPaid}
+          disabled={isPaidLoading}
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[var(--pill-light)] text-[var(--pill-light-text)] text-xs font-black shadow-sm hover:opacity-90 transition-all monai-press active:scale-95 disabled:opacity-50"
+          title="Marcar como pagada y reiniciar ciclo"
+        >
+          <CheckCircle2 className="w-3.5 h-3.5 text-[var(--green)] stroke-[2.5]" />
+          <span>{isPaidLoading ? "..." : "⊕ Marcar Pagada"}</span>
+        </button>
       </div>
     </div>
   );

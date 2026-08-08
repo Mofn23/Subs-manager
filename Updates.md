@@ -136,4 +136,22 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
 - **Decisiones de diseño**: Creación del catálogo completo de primitivas del sistema de diseño MonAI: pills redondeadas `radius 999`, avatares tintados con badge `↻` recurrente, `AmountPill` para montos, menú `MonaiDropdown` con escala 160ms, `MonaiSheet` fullscreen con top radius 32px y botón `⊗` circular 48px, interruptor iOS `MonaiToggle`, botón flotante `MonaiFAB` coral de 72px y `MonaiBottomNav` flotante.
 - **Cómo verificar**: Ejecución limpia del test suite `npm run test` (4/4 tests pasados).
 
+---
+
+## [Rediseño MonAI - F3] - 2026-08-08 (Dashboard & SubscriptionCard MonAI) - COMPLETADO ✅
+
+- **Fase**: F3 - Dashboard, SubscriptionCard, TotalBlock, Filtros y Búsqueda
+- **Archivos cambiados**: `src/app/DashboardView.tsx`, `src/components/dashboard/HeroStats.tsx`, `src/components/dashboard/AttentionSection.tsx`, `src/components/dashboard/SubscriptionFilterTabs.tsx`, `src/components/dashboard/SubscriptionCard.tsx`, `src/components/layout/Navbar.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se rediseñó por completo el Dashboard al sistema MonAI:
+  - **TopBar**: Pill izquierda `‹Periodo/Mes› ⌄` (56px) + botones circulares (Settings, Tema, Notificaciones).
+  - **TotalBlock Hero**: Número gigante `w900` (68px) + badge circular `⊖` coral + sufijo `COP` + anualizado + tracker de presupuesto en `SegmentedPill`.
+  - **BarChart por categoría**: Scroll horizontal con barras `radius 24` (`#1A1A1C`), emoji + valor compacto, con tap para filtrar dinámicamente mediante chip emoji+`⊗`.
+  - **Requires Attention**: `ListGroup` MonAI con header pill en ámbar suave + total 7 días y acción 1-tap `[✓ Pagado]` como pill clara `⊕` siempre visible.
+  - **SubscriptionCard**: Fila MonAI con avatar emoji 64px tintado (+badge `↻`), categoría, proveedor `w800`, TagPills, `AmountPill` oscura `⊖ $X` + menú `MonaiDropdown` (5 acciones) + botón `[✓ Marcar Pagada]` en footer.
+  - **ListGroups**: Agrupación inteligente por renovación (Hoy / Esta semana / Este mes / Después) con totales por grupo.
+  - **MonAI FAB**: Botón flotante de 72px coral en la esquina inferior derecha.
+  - **BottomNav**: Barra flotante inferior con 4 íconos Lucide.
+- **Cómo verificar**: Ejecutar `npm run test` y verificar en el navegador la renderización pixel-perfect del Dashboard en modo oscuro y claro.
+
+
 

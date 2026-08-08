@@ -1,5 +1,6 @@
 "use client";
 
+import { MonaiPill } from "@/components/ui/MonaiPill";
 import { formatCurrency } from "@/lib/financials";
 import { ArrowUpRight, TrendingDown } from "lucide-react";
 import Link from "next/link";
@@ -43,86 +44,85 @@ export function HeroStats({
 
   return (
     <div className="space-y-4">
-      {/* Main Ultra-Minimal Centered Hero Card */}
-      <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple transition-all flex flex-col items-center justify-center text-center">
-        {/* Small Centered Gray Title */}
-        <div className="text-xs font-medium uppercase tracking-wider text-apple-tertiary dark:text-neutral-400 mb-1">
-          Total Monthly Spend
+      {/* MonAI Ultra-Minimal TotalBlock Hero */}
+      <div className="bg-[var(--surface)] rounded-[32px] p-8 sm:p-10 border border-[var(--border)] shadow-2xl flex flex-col items-center justify-center text-center transition-all">
+        {/* Label Gris Centrado */}
+        <div className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] mb-2">
+          Monthly Spend
         </div>
 
-        {/* Predominant Big Bold Main Value + Subtle COP (No $ symbol) */}
-        <div className="flex items-baseline justify-center gap-1.5 my-1">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-apple-text dark:text-white tracking-tight">
+        {/* MonAI TotalBlock: Badge circular (32px) + Número Gigante (w900) + Sufijo Gris */}
+        <div className="flex items-center justify-center gap-3 my-2 flex-wrap">
+          {/* Badge circular 32px coral ⊖ */}
+          <div className="w-9 h-9 rounded-full bg-[var(--coral)]/20 text-[var(--coral)] border border-[var(--coral)]/40 flex items-center justify-center text-xl font-black shrink-0">
+            ⊖
+          </div>
+
+          <h1 className="text-[56px] sm:text-[68px] font-black text-[var(--text-primary)] tracking-tight leading-none">
             {formatNumberOnly(monthlyTotal)}
           </h1>
-          <span className="text-base sm:text-lg font-light text-apple-tertiary dark:text-neutral-400 tracking-normal">
+
+          <span className="text-lg sm:text-xl font-black text-[var(--text-secondary)] self-end pb-1.5">
             {currencyCode}
           </span>
         </div>
 
-        {/* Small Annual Value directly underneath */}
-        <div className="flex items-baseline justify-center gap-1 text-xs sm:text-sm font-medium text-apple-tertiary dark:text-neutral-400 mt-0.5">
-          <span>{formatNumberOnly(annualTotal)}</span>
-          <span className="font-light">Annual</span>
+        {/* Secundario: Anualizado */}
+        <div className="text-sm font-bold text-[var(--text-secondary)] mt-1">
+          <span>{formatNumberOnly(annualTotal)} {currencyCode}</span>
+          <span className="font-semibold text-[var(--text-placeholder)] ml-1">Annual</span>
         </div>
 
-        {/* Conditional Bottom Bar: Only renders budget if budget is set, and/or potential savings */}
-        {(hasBudget || potentialMonthlySavings > 0) && (
-          <div
-            className={`w-full pt-6 border-t border-apple-border dark:border-white/10 mt-6 grid grid-cols-1 ${
-              hasBudget ? "md:grid-cols-2" : "grid-cols-1"
-            } gap-6 text-left`}
-          >
-            {/* Monthly Budget Tracker (Hidden completely if budget is empty/null/0) */}
-            {hasBudget && (
+        {/* SegmentedPill Presupuesto vs Gasto */}
+        {hasBudget && (
+          <div className="mt-6 pt-6 border-t border-[var(--border-subtle)] w-full max-w-md">
+            <div className="flex items-center justify-between gap-2 p-1.5 rounded-full bg-[var(--tag)] border border-[var(--border)]">
+              <div className={`flex-1 py-1.5 px-3 rounded-full text-xs font-black transition-all ${isOverBudget ? "bg-[var(--coral)] text-white" : "bg-[var(--surface-elevated)] text-[var(--text-primary)]"}`}>
+                ⊖ {formatCurrency(monthlyTotal, currency)} spent
+              </div>
+              <div className="flex-1 py-1.5 px-3 rounded-full text-xs font-bold text-[var(--text-secondary)] text-right">
+                🎯 {formatCurrency(monthlyBudget as number, currency)} budget
+              </div>
+            </div>
+
+            {/* Budget Progress Indicator */}
+            <div className="w-full h-2 rounded-full bg-[var(--surface-elevated)] overflow-hidden mt-3 p-0.5 border border-[var(--border-subtle)]">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isOverBudget
+                    ? "bg-[var(--coral)]"
+                    : budgetRatio > 80
+                    ? "bg-[var(--amber)]"
+                    : "bg-[var(--green)]"
+                }`}
+                style={{ width: `${Math.min(budgetRatio, 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Savings Optimization Pill */}
+        {potentialMonthlySavings > 0 && (
+          <div className="mt-4 w-full max-w-md flex items-center justify-between p-3.5 rounded-2xl bg-[var(--coral)]/10 border border-[var(--coral)]/20 text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[var(--coral)] text-white flex items-center justify-center shrink-0">
+                <TrendingDown className="w-4 h-4 stroke-[2.5]" />
+              </div>
               <div>
-                <div className="flex items-center justify-between text-xs font-medium mb-2">
-                  <span className="text-apple-secondary dark:text-neutral-400">Monthly Budget</span>
-                  <span className={isOverBudget ? "text-apple-danger font-semibold" : "text-apple-text dark:text-white"}>
-                    {formatCurrency(monthlyTotal, currency)} of {formatCurrency(monthlyBudget as number, currency)} (
-                    {Math.round(budgetRatio)}%)
-                  </span>
-                </div>
-
-                <div className="w-full h-2.5 rounded-full bg-apple-bg dark:bg-neutral-800 overflow-hidden p-0.5 border border-apple-border dark:border-white/10">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      isOverBudget
-                        ? "bg-apple-danger"
-                        : budgetRatio > 80
-                        ? "bg-apple-warning"
-                        : "bg-apple-accent"
-                    }`}
-                    style={{ width: `${Math.min(budgetRatio, 100)}%` }}
-                  />
+                <div className="text-xs font-black text-[var(--text-primary)]">Subscription Leaks Detected</div>
+                <div className="text-xs font-bold text-[var(--text-secondary)]">
+                  Potential savings {formatCurrency(potentialMonthlySavings, currency)}/mo
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Savings Optimization Pill */}
-            {potentialMonthlySavings > 0 && (
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-apple-accent-soft/60 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-500/20 text-apple-accent dark:text-blue-400 flex items-center justify-center">
-                    <TrendingDown className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold text-apple-text dark:text-white">Potential Savings</div>
-                    <div className="text-xs text-apple-secondary dark:text-neutral-400">
-                      Save up to {formatCurrency(potentialMonthlySavings, currency)}/mo
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  href="/insights"
-                  className="flex items-center gap-1 text-xs font-medium text-apple-accent hover:text-apple-accent-hover transition-colors"
-                >
-                  Review
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            )}
+            <Link
+              href="/insights"
+              className="flex items-center gap-1 text-xs font-extrabold text-[var(--coral)] hover:underline"
+            >
+              Review
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         )}
       </div>

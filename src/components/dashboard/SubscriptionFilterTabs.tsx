@@ -19,26 +19,27 @@ export function SubscriptionFilterTabs({ currentFilter, onFilterChange, counts }
   ];
 
   return (
-    <div className="flex items-center gap-1 overflow-x-auto p-1 bg-black/5 dark:bg-white/5 rounded-2xl border border-apple-border dark:border-white/10 scrollbar-none">
+    <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 bg-[var(--surface)] rounded-full border border-[var(--border)] scrollbar-none">
       {tabs.map((tab) => {
         const isActive = currentFilter === tab.id;
         const count = counts[tab.id] || 0;
         return (
           <button
             key={tab.id}
+            type="button"
             onClick={() => onFilterChange(tab.id)}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black whitespace-nowrap transition-all duration-150 monai-press active:scale-95 ${
               isActive
-                ? "bg-white dark:bg-[#16161A] text-apple-text dark:text-white shadow-apple"
-                : "text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10"
+                ? "bg-[var(--surface-elevated)] text-[var(--text-primary)] border border-white/20 shadow-md"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5"
             }`}
           >
             <span>{tab.label}</span>
             <span
-              className={`px-1.5 py-0.2 text-[10px] rounded-full font-semibold ${
+              className={`px-2 py-0.5 text-[10px] rounded-full font-black ${
                 isActive
-                  ? "bg-apple-accent-soft dark:bg-blue-500/20 text-apple-accent dark:text-blue-400"
-                  : "bg-black/5 dark:bg-white/10 text-apple-tertiary dark:text-neutral-400"
+                  ? "bg-[var(--coral)] text-white"
+                  : "bg-[var(--tag)] text-[var(--text-secondary)]"
               }`}
             >
               {count}

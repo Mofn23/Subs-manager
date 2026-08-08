@@ -7,7 +7,9 @@ import { SubscriptionCard } from "@/components/dashboard/SubscriptionCard";
 import { FilterStatus, SubscriptionFilterTabs } from "@/components/dashboard/SubscriptionFilterTabs";
 import { OnboardingModal } from "@/components/modals/OnboardingModal";
 import { SubscriptionModal } from "@/components/modals/SubscriptionModal";
-import { calculateSpendSummary, detectSubscriptionLeaks, SubscriptionItem } from "@/lib/financials";
+import { MonaiFAB } from "@/components/ui/MonaiFAB";
+import { MonaiPill } from "@/components/ui/MonaiPill";
+import { calculateMonthlyEquivalent, calculateSpendSummary, detectSubscriptionLeaks, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
 import { Plus, Search, Sparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -21,6 +23,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
   const { data: session } = useSession();
   const [filter, setFilter] = useState<FilterStatus>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSub, setEditingSub] = useState<SubscriptionItem | null>(null);
 
@@ -28,7 +31,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
   const monthlyBudget = session?.user?.monthlyBudget;
   const showOnboarding = session?.user && !session.user.onboarded;
 
-  // Process data
+  // Process subscriptions
   const subscriptions: SubscriptionItem[] = useMemo(() => {
     return initialSubscriptions.map((s) => ({
       ...s,
@@ -44,6 +47,34 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
 
   const leaks = useMemo(() => {
     return detectSubscriptionLeaks(subscriptions);
+  }, [subscriptions]);
+
+  // Category breakdown for horizontal MonAI BarChart
+  const categoryBarData = useMemo(() => {
+    const map: Record<string, { total: number; icon: string; count: number }> = {};
+    subscriptions.forEach((sub) => {
+      if (sub.status === "ACTIVE" || sub.status === "TRIAL" || sub.status === "TO_CANCEL") {
+        const cat = sub.category || "Other";
+        const cost = calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths);
+        const icon = sub.icon || getAutoEmoji(sub.name, cat);
+        if (!map[cat]) {
+          map[cat] = { total: 0, icon, count: 0 };
+        }
+        map[cat].total += cost;
+        map[cat].count += 1;
+      }
+    });
+
+    const items = Object.entries(map).map(([category, data]) => ({
+      category,
+      total: data.total,
+      icon: data.icon,
+      count: data.count,
+    }));
+
+    const maxTotal = Math.max(...items.map((i) => i.total), 1);
+
+    return { items, maxTotal };
   }, [subscriptions]);
 
   // Counts map for filter tabs
@@ -63,6 +94,11 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
   // Filtered subscriptions list
   const filteredSubscriptions = useMemo(() => {
     return subscriptions.filter((sub) => {
+      // Category filter chip
+      if (selectedCategoryFilter && sub.category !== selectedCategoryFilter) {
+        return false;
+      }
+
       // Search filter
       const matchesSearch =
         sub.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -87,7 +123,36 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
           return true;
       }
     });
-  }, [subscriptions, filter, searchQuery]);
+  }, [subscriptions, filter, searchQuery, selectedCategoryFilter]);
+
+  // Group filtered subscriptions into MonAI ListGroups by renewal horizon
+  const groupedSubscriptions = useMemo(() => {
+    const referenceDate = new Date();
+    const today: SubscriptionItem[] = [];
+    const thisWeek: SubscriptionItem[] = [];
+    const thisMonth: SubscriptionItem[] = [];
+    const later: SubscriptionItem[] = [];
+
+    filteredSubscriptions.forEach((sub) => {
+      const days = getDaysUntil(sub.nextRenewalDate, referenceDate);
+      if (days <= 0) today.push(sub);
+      else if (days <= 7) thisWeek.push(sub);
+      else if (days <= 30) thisMonth.push(sub);
+      else later.push(sub);
+    });
+
+    const groups: { title: string; subs: SubscriptionItem[]; total: number }[] = [];
+
+    const calcTotal = (items: SubscriptionItem[]) =>
+      items.reduce((acc, s) => acc + s.price, 0);
+
+    if (today.length > 0) groups.push({ title: "Renews Today / Overdue", subs: today, total: calcTotal(today) });
+    if (thisWeek.length > 0) groups.push({ title: "This Week", subs: thisWeek, total: calcTotal(thisWeek) });
+    if (thisMonth.length > 0) groups.push({ title: "This Month", subs: thisMonth, total: calcTotal(thisMonth) });
+    if (later.length > 0) groups.push({ title: "Later", subs: later, total: calcTotal(later) });
+
+    return groups;
+  }, [filteredSubscriptions]);
 
   const router = useRouter();
   const handleDelete = async (id: string) => {
@@ -97,12 +162,18 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
     }
   };
 
+  const formatCompactValue = (amount: number) => {
+    if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M`;
+    if (amount >= 1000) return `${(amount / 1000).toFixed(0)}K`;
+    return amount.toFixed(0);
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto pb-20">
       {/* Onboarding Modal for New Users */}
       <OnboardingModal isOpen={!!showOnboarding} onClose={() => {}} />
 
-      {/* Hero Stats */}
+      {/* Hero TotalBlock */}
       <HeroStats
         monthlyTotal={spendSummary.monthlyTotal}
         annualTotal={spendSummary.annualTotal}
@@ -112,86 +183,159 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
         activeCount={spendSummary.activeCount}
       />
 
+      {/* MonAI Horizontal Scroll BarChart by Category */}
+      {categoryBarData.items.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
+              Spend by Category
+            </span>
+            {selectedCategoryFilter && (
+              <MonaiPill
+                variant="coral"
+                onClick={() => setSelectedCategoryFilter(null)}
+                className="text-xs font-extrabold"
+              >
+                Category: {selectedCategoryFilter} ⊗
+              </MonaiPill>
+            )}
+          </div>
+
+          <div className="flex items-end gap-3 overflow-x-auto pb-2 pt-4 px-2 scrollbar-none">
+            {categoryBarData.items.map((cat) => {
+              const heightPercent = Math.max(Math.round((cat.total / categoryBarData.maxTotal) * 100), 24);
+              const isSelected = selectedCategoryFilter === cat.category;
+
+              return (
+                <button
+                  key={cat.category}
+                  type="button"
+                  onClick={() => {
+                    if (isSelected) setSelectedCategoryFilter(null);
+                    else setSelectedCategoryFilter(cat.category);
+                  }}
+                  className={`flex flex-col items-center justify-end w-24 h-40 rounded-[24px] p-3 transition-all duration-200 shrink-0 monai-press active:scale-95 border ${
+                    isSelected
+                      ? "bg-[#242426] border-[var(--coral)] ring-2 ring-[var(--coral)]/50 shadow-xl"
+                      : "bg-[#1A1A1C] border-[var(--border-subtle)] hover:bg-[#202022]"
+                  }`}
+                >
+                  {/* Visual Bar height fill inside container */}
+                  <div
+                    className={`w-full rounded-2xl transition-all duration-300 flex flex-col justify-end items-center p-2 mb-2 ${
+                      isSelected ? "bg-[var(--coral)] text-white" : "bg-[var(--surface-elevated)] text-[var(--text-primary)]"
+                    }`}
+                    style={{ height: `${heightPercent}%` }}
+                  />
+
+                  {/* Icon & compact amount */}
+                  <div className="flex items-center gap-1.5 text-sm font-black text-[var(--text-primary)]">
+                    <span>{cat.icon}</span>
+                    <span className="text-xs">{formatCompactValue(cat.total)}</span>
+                  </div>
+                  <span className="text-[11px] font-bold text-[var(--text-secondary)] truncate w-full text-center mt-0.5">
+                    {cat.category}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Attention Section (Expiring trials & upcoming renewals) */}
       <AttentionSection subscriptions={subscriptions} currency={currency} />
 
       {/* Subscriptions List Control Section */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-apple-text dark:text-white tracking-tight">Your Subscriptions</h2>
+          <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Your Subscriptions</h2>
 
-          <div className="flex items-center gap-3">
-            {/* Search Box */}
-            <div className="relative flex-1 sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-apple-tertiary dark:text-neutral-400" />
-              <input
-                type="text"
-                placeholder="Search provider, category..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#16161A] border border-apple-border dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white shadow-sm placeholder:text-apple-tertiary dark:placeholder:text-neutral-500"
-              />
-            </div>
-
-            {/* Add Subscription Button */}
-            <button
-              onClick={() => {
-                setEditingSub(null);
-                setIsModalOpen(true);
-              }}
-              className="px-4 py-1.5 rounded-xl bg-apple-text dark:bg-white text-white dark:text-black text-xs font-medium hover:opacity-90 transition flex items-center gap-1.5 shadow-sm shrink-0"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Add Subscription
-            </button>
+          {/* Search Box MonAI style */}
+          <div className="relative w-full sm:w-72">
+            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+            <input
+              type="text"
+              placeholder="Search provider, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 rounded-full bg-[var(--surface)] border border-[var(--border)] text-xs font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-[var(--text-placeholder)] shadow-inner"
+            />
           </div>
         </div>
 
         {/* Filter Segmented Controls */}
         <SubscriptionFilterTabs currentFilter={filter} onFilterChange={setFilter} counts={counts} />
 
-        {/* Cards Grid */}
-        {filteredSubscriptions.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-[#16161A] rounded-3xl border border-apple-border dark:border-white/10 p-8 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-apple-bg dark:bg-neutral-800 flex items-center justify-center text-apple-tertiary dark:text-neutral-400 mx-auto">
-              <Sparkles className="w-6 h-6" />
+        {/* ListGroups grouped by renewal date */}
+        {groupedSubscriptions.length === 0 ? (
+          <div className="text-center py-20 bg-[var(--surface)] rounded-[32px] border border-[var(--border)] p-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-3xl mx-auto shadow-sm">
+              🍿
             </div>
-            <h3 className="font-semibold text-apple-text dark:text-white text-sm">No subscriptions found</h3>
-            <p className="text-xs text-apple-secondary dark:text-neutral-400 max-w-sm mx-auto">
+            <h3 className="font-black text-[var(--text-primary)] text-lg">No subscriptions found</h3>
+            <p className="text-xs font-bold text-[var(--text-secondary)] max-w-sm mx-auto">
               {searchQuery
-                ? `No results matching "${searchQuery}". Try adjusting your search query.`
+                ? `No results matching "${searchQuery}". Try adjusting your search.`
                 : "You don't have any subscriptions in this view yet."}
             </p>
             <button
+              type="button"
               onClick={() => {
                 setEditingSub(null);
                 setIsModalOpen(true);
               }}
-              className="mt-2 px-4 py-2 rounded-xl bg-apple-accent-soft dark:bg-blue-500/20 text-apple-accent dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-500/30 transition inline-flex items-center gap-1.5"
+              className="mt-2 px-5 py-2.5 rounded-full bg-[var(--coral)] text-white text-xs font-black shadow-lg hover:opacity-90 transition inline-flex items-center gap-2 monai-press"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               Add your first subscription
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredSubscriptions.map((sub) => (
-              <SubscriptionCard
-                key={sub.id}
-                subscription={sub}
-                currency={currency}
-                onEdit={(subToEdit) => {
-                  setEditingSub(subToEdit);
-                  setIsModalOpen(true);
-                }}
-                onDelete={handleDelete}
-              />
+          <div className="space-y-8">
+            {groupedSubscriptions.map((group) => (
+              <div key={group.title} className="space-y-3">
+                {/* ListGroup Header */}
+                <div className="flex items-center justify-between px-2">
+                  <MonaiPill variant="default" className="text-xs font-black uppercase tracking-wider">
+                    {group.title} ({group.subs.length})
+                  </MonaiPill>
+
+                  <MonaiPill variant="tag" className="text-xs font-bold">
+                    Group Total: {formatCurrency(group.total, currency)}
+                  </MonaiPill>
+                </div>
+
+                {/* Subscriptions Grid inside group */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {group.subs.map((sub) => (
+                    <SubscriptionCard
+                      key={sub.id}
+                      subscription={sub}
+                      currency={currency}
+                      onEdit={(subToEdit) => {
+                        setEditingSub(subToEdit);
+                        setIsModalOpen(true);
+                      }}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Add / Edit Subscription Modal */}
+      {/* Floating Action Button (MonAI Coral 76px FAB) */}
+      <MonaiFAB
+        onClick={() => {
+          setEditingSub(null);
+          setIsModalOpen(true);
+        }}
+      />
+
+      {/* Add / Edit Subscription Fullscreen Sheet */}
       <SubscriptionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
