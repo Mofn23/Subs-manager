@@ -106,5 +106,14 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
 - **Frontend**: Next.js 14+ App Router, TypeScript, Tailwind CSS, Lucide React Icons.
 - **Backend & Database**: Server Actions, Prisma ORM, SQLite en desarrollo local / PostgreSQL ready.
 - **Validación & Fechas**: Zod, `date-fns`.
-- **Pruebas Unitarias**: Test suite nativo ejecutado con éxito (4/4 tests pasados).
-- **Compilación**: Next.js build compilado con éxito (7/7 rutas estáticas y dinámicas optimizadas).
+- Pruebas Unitarias: Test suite nativo ejecutado con éxito (4/4 tests pasados).
+- Compilación: Next.js build compilado con éxito (7/7 rutas estáticas y dinámicas optimizadas).
+
+---
+
+## [Rediseño MonAI - F0] - 2026-08-08 (Inventario y Plan de Mapeo) - COMPLETADO ✅
+
+- **Fase**: F0 - Inventario Completo & REDESIGN.md
+- **Archivos cambiados**: `REDESIGN.md`, `Updates.md`
+- **Decisiones de diseño**: Se realizó un inventario completo de las 6 vistas principales (`/`, `/timeline`, `/insights`, `/cancellation`, `/settings`, `/login`), componentes del dashboard, modales, layout y servidor. Se trazó la matriz de equivalencias hacia el sistema visual MonAI (dark mode principal `#0B0B0D`, tarjetas `#1C1C1E`, acentos verde `#34C759` y coral `#E8505B`, tipografía Nunito 700/800/900, pills redondeadas, TotalBlock con número gigante `w900`, FABs flotantes y bottom nav).
+- **Cómo verificar**: Consultar `REDESIGN.md` en la raíz del proyecto para la matriz de componentes y reglas duras de preservación.
