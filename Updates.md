@@ -186,6 +186,19 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
   - **Distribución de gasto por categoría**: Barras de progreso con acento verde pastel `MonAI`.
 - **Cómo verificar**: Navegar a `/insights` en la app y verificar la detección de suscripciones marcadas como poco usadas.
 
+---
+
+## [Rediseño MonAI - F7] - 2026-08-08 (Cancellation View MonAI) - COMPLETADO ✅
+
+- **Fase**: F7 - Cancellation View MonAI (`/cancellation`)
+- **Archivos cambiados**: `src/app/cancellation/CancellationView.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se rediseñó el centro de cancelación al estilo MonAI:
+  - **Header Card & Total Saved Badge**: Total acumulado ahorrado en verde `MonAI`.
+  - **ListGroup "Ready for Cancellation"**: Filas con avatar emoji `✂️`, proveedor `w800`, pasos en cuadro secundario numerado, TagPills y botones "Abrir URL" (Pill clara) y "Confirm Canceled" (Verde MonAI).
+  - **Historial Verificado**: Lista de cancelaciones confirmadas con acción `Reactivate`.
+- **Cómo verificar**: Navegar a `/cancellation` y verificar los botones de acción rápida de cancelación.
+
+
 
 
 

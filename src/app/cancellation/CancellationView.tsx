@@ -1,8 +1,12 @@
 "use client";
 
 import { updateSubscriptionStatus } from "@/app/actions/subscriptions";
+import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
+import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
+import { MonaiButton } from "@/components/ui/MonaiButton";
+import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, formatCurrency } from "@/lib/financials";
-import { CheckCircle2, ExternalLink, ShieldAlert, Sparkles, Trash2, Undo2 } from "lucide-react";
+import { CheckCircle2, ExternalLink, ShieldAlert, Sparkles, Undo2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
 
@@ -37,92 +41,107 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Header Card */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple">
+    <div className="space-y-8 max-w-4xl mx-auto pb-24">
+      {/* Header MonAI Card */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--surface)] rounded-[32px] p-8 border border-[var(--border)] shadow-2xl">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-apple-secondary dark:text-neutral-400 mb-1">
-            <ShieldAlert className="w-3.5 h-3.5 text-apple-tertiary dark:text-neutral-500" />
-            Cancellation Workflow
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] mb-2">
+            <ShieldAlert className="w-4 h-4 text-[var(--coral)] stroke-[2.5]" />
+            Cancellation Center
           </div>
-          <h1 className="text-2xl font-semibold text-apple-text dark:text-white tracking-tight">Cancellation Center</h1>
-          <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
-            Step-by-step guides, direct links, and verified confirmation to stop unwanted renewals.
+          <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Cancellation Workflow</h1>
+          <p className="text-xs font-bold text-[var(--text-secondary)] mt-1">
+            Step-by-step guides, direct cancel links, and verified confirmations.
           </p>
         </div>
 
-        {/* Money Recovered Hero Badge */}
-        <div className="px-5 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/60 dark:border-emerald-500/30 text-right self-start sm:self-auto">
-          <div className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
-            Total Money Saved
+        {/* Total Saved Badge */}
+        <div className="p-5 rounded-[24px] bg-[var(--green)]/10 border border-[var(--green)]/30 text-right self-start sm:self-auto shrink-0">
+          <div className="text-[11px] font-black text-[var(--green)] uppercase tracking-wider">
+            Total Saved
           </div>
-          <div className="text-xl font-bold text-emerald-900 dark:text-emerald-200">
+          <div className="text-2xl font-black text-[var(--text-primary)] mt-0.5">
             {formatCurrency(savedMonthlyTotal, currency)}/mo
           </div>
-          <div className="text-[10px] text-emerald-700 dark:text-emerald-400">
+          <div className="text-[11px] font-bold text-[var(--text-secondary)]">
             ({formatCurrency(savedMonthlyTotal * 12, currency)}/year recovered)
           </div>
         </div>
       </div>
 
-      {/* Pending Cancellations Section */}
+      {/* MonAI ListGroup: Ready for Cancellation */}
       <div className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-apple-secondary dark:text-neutral-400 px-2">
-          Subscriptions Ready for Cancellation ({toCancelSubs.length})
-        </h3>
+        <div className="flex items-center justify-between px-2">
+          <MonaiPill variant="coral" className="text-xs font-black">
+            ✂️ Ready for Cancellation ({toCancelSubs.length})
+          </MonaiPill>
+        </div>
 
         {toCancelSubs.length === 0 ? (
-          <div className="text-center py-10 bg-white dark:bg-[#16161A] rounded-3xl border border-apple-border dark:border-white/10 p-6 text-xs text-apple-secondary dark:text-neutral-400 space-y-2">
-            <Sparkles className="w-5 h-5 text-blue-500 mx-auto" />
-            <p>No pending cancellations! All active subscriptions are intentionally kept.</p>
+          <div className="text-center py-16 bg-[var(--surface)] rounded-[32px] border border-[var(--border)] p-8 space-y-3">
+            <div className="w-16 h-16 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-3xl mx-auto shadow-sm">
+              ✨
+            </div>
+            <h3 className="font-black text-[var(--text-primary)] text-base">No pending cancellations!</h3>
+            <p className="text-xs font-bold text-[var(--text-secondary)] max-w-sm mx-auto">
+              All your active subscriptions are intentionally kept.
+            </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {toCancelSubs.map((sub) => (
               <div
                 key={sub.id}
-                className="bg-white dark:bg-[#16161A] rounded-2xl p-5 border border-apple-border dark:border-white/10 shadow-apple space-y-4"
+                className="bg-[var(--surface)] rounded-[28px] p-6 border border-[var(--border)] shadow-xl space-y-5"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-apple-text dark:text-white text-base">{sub.name}</h4>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 font-semibold">
-                        To Cancel
-                      </span>
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex items-start gap-4 min-w-0">
+                    <MonaiAvatar emoji="✂️" size="lg" isRecurring={true} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-xl font-black text-[var(--text-primary)] truncate">{sub.name}</h4>
+                        <MonaiPill variant="coral" className="text-[11px] py-0.5 px-2.5">
+                          To Cancel
+                        </MonaiPill>
+                      </div>
+                      <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5">
+                        {sub.provider} • {formatCurrency(sub.price, currency)}/{sub.billingCycle.toLowerCase()}
+                      </p>
                     </div>
-                    <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
-                      {sub.provider} • {formatCurrency(sub.price, currency)}/{sub.billingCycle.toLowerCase()}
-                    </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 shrink-0">
                     {sub.cancelUrl && (
                       <a
                         href={sub.cancelUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-500/20 text-apple-accent dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-500/30 transition flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-full bg-[var(--pill-light)] text-[var(--pill-light-text)] text-xs font-black flex items-center gap-1.5 shadow-sm hover:opacity-95 transition monai-press active:scale-95"
                       >
-                        Official Cancel Page
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Abrir URL</span>
+                        <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
                       </a>
                     )}
                     <button
+                      type="button"
                       onClick={() => handleVerifyCancel(sub.id)}
-                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition flex items-center gap-1 shadow-sm"
+                      className="px-4 py-2 rounded-full bg-[var(--green)] text-black text-xs font-black flex items-center gap-1.5 shadow-lg hover:opacity-90 transition monai-press active:scale-95"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Confirm Canceled
+                      <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                      <span>Confirm Canceled</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Steps or Notes */}
+                {/* Steps or Instructions */}
                 {sub.cancelSteps && (
-                  <div className="p-3.5 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs space-y-1">
-                    <div className="font-semibold text-apple-text dark:text-white text-[11px]">Cancellation Instructions:</div>
-                    <p className="text-apple-secondary dark:text-neutral-400 whitespace-pre-line leading-relaxed">{sub.cancelSteps}</p>
+                  <div className="p-4 rounded-[20px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] space-y-1.5 text-xs">
+                    <div className="font-black text-[var(--text-primary)] text-xs uppercase tracking-wider">
+                      Cancellation Steps:
+                    </div>
+                    <p className="text-[var(--text-secondary)] font-semibold whitespace-pre-line leading-relaxed">
+                      {sub.cancelSteps}
+                    </p>
                   </div>
                 )}
               </div>
@@ -131,38 +150,41 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
         )}
       </div>
 
-      {/* History of Successfully Canceled Subscriptions */}
+      {/* Verified Canceled History */}
       <div className="space-y-3 pt-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-apple-secondary dark:text-neutral-400 px-2">
-          Verified Canceled History ({cancelledSubs.length})
-        </h3>
+        <div className="flex items-center justify-between px-2">
+          <MonaiPill variant="tag" className="text-xs font-black">
+            Verified Canceled History ({cancelledSubs.length})
+          </MonaiPill>
+        </div>
 
         {cancelledSubs.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {cancelledSubs.map((sub) => (
               <div
                 key={sub.id}
-                className="bg-white/80 dark:bg-[#16161A]/80 rounded-2xl p-4 border border-apple-border dark:border-white/10 flex items-center justify-between gap-4 text-xs"
+                className="bg-[var(--surface)] rounded-[24px] p-4 border border-[var(--border-subtle)] flex items-center justify-between gap-4 text-xs"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-apple-text dark:text-white line-through">{sub.name}</span>
-                    <p className="text-[11px] text-apple-tertiary dark:text-neutral-400">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <MonaiAvatar emoji="📦" size="sm" isRecurring={false} />
+                  <div className="min-w-0">
+                    <span className="font-black text-[var(--text-primary)] text-sm line-through block truncate">
+                      {sub.name}
+                    </span>
+                    <p className="text-[11px] font-bold text-[var(--text-secondary)] truncate">
                       Verified canceled • Saved {formatCurrency(sub.price, currency)}/{sub.billingCycle.toLowerCase()}
                     </p>
                   </div>
                 </div>
 
-                <button
+                <MonaiButton
+                  variant="surface"
+                  size="sm"
                   onClick={() => handleReactivate(sub.id)}
-                  className="px-3 py-1 rounded-xl bg-apple-bg dark:bg-neutral-800 text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-gray-200 dark:hover:bg-neutral-700 transition text-[11px] font-medium flex items-center gap-1"
                 >
-                  <Undo2 className="w-3 h-3" />
+                  <Undo2 className="w-3.5 h-3.5" />
                   Reactivate
-                </button>
+                </MonaiButton>
               </div>
             ))}
           </div>
