@@ -1,8 +1,11 @@
 "use client";
 
-import { formatCurrency, getDaysUntil } from "@/lib/financials";
-import { format, isSameMonth, parseISO } from "date-fns";
-import { Calendar as CalendarIcon, Clock, ExternalLink, ShieldAlert, Sparkles } from "lucide-react";
+import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
+import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
+import { MonaiPill } from "@/components/ui/MonaiPill";
+import { formatCurrency, getAutoEmoji, getDaysUntil } from "@/lib/financials";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon, ExternalLink } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 
@@ -32,15 +35,16 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
 
   // Group events by Month
   const groupedEvents = useMemo(() => {
-    const groups: { monthName: string; events: typeof filteredEvents }[] = [];
+    const groups: { monthName: string; events: typeof filteredEvents; monthTotal: number }[] = [];
 
     filteredEvents.forEach((event) => {
       const monthName = format(event.renewalDate, "MMMM yyyy");
       const existing = groups.find((g) => g.monthName === monthName);
       if (existing) {
         existing.events.push(event);
+        existing.monthTotal += event.price;
       } else {
-        groups.push({ monthName, events: [event] });
+        groups.push({ monthName, events: [event], monthTotal: event.price });
       }
     });
 
@@ -53,132 +57,142 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
   }, [filteredEvents]);
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#16161A] rounded-3xl p-6 border border-apple-border dark:border-white/10 shadow-apple">
+    <div className="space-y-8 max-w-4xl mx-auto pb-24">
+      {/* Header MonAI Card */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--surface)] rounded-[32px] p-8 border border-[var(--border)] shadow-2xl">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-apple-secondary dark:text-neutral-400 mb-1">
-            <CalendarIcon className="w-3.5 h-3.5 text-apple-tertiary dark:text-neutral-500" />
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] mb-2">
+            <CalendarIcon className="w-4 h-4 text-[var(--coral)] stroke-[2.5]" />
             Renewal Timeline
           </div>
-          <h1 className="text-2xl font-semibold text-apple-text dark:text-white tracking-tight">Upcoming Charges</h1>
-          <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
-            Calm, chronological foresight into future billing dates.
+          <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Upcoming Charges</h1>
+          <p className="text-xs font-bold text-[var(--text-secondary)] mt-1">
+            Chronological foresight into future subscription renewals.
           </p>
         </div>
 
-        {/* Time horizon segmented tab */}
-        <div className="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1 rounded-2xl border border-apple-border dark:border-white/10 text-xs font-medium self-start sm:self-auto">
+        {/* Time horizon segmented pill */}
+        <div className="flex items-center gap-1.5 bg-[var(--tag)] p-1.5 rounded-full border border-[var(--border)] self-start sm:self-auto">
           {(["7d", "30d", "90d", "1y"] as TimeRange[]).map((range) => (
             <button
               key={range}
+              type="button"
               onClick={() => setTimeRange(range)}
-              className={`px-3 py-1.5 rounded-xl transition ${
+              className={`px-4 py-2 rounded-full text-xs font-black transition-all duration-150 monai-press active:scale-95 ${
                 timeRange === range
-                  ? "bg-white dark:bg-[#16161A] text-apple-text dark:text-white shadow-apple font-semibold"
-                  : "text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white"
+                  ? "bg-[var(--surface-elevated)] text-[var(--text-primary)] border border-white/20 shadow-md"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
               {range === "7d"
-                ? "Next 7 Days"
+                ? "Next 7d"
                 : range === "30d"
-                ? "30 Days"
+                ? "30d"
                 : range === "90d"
-                ? "90 Days"
+                ? "90d"
                 : "1 Year"}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Timeline total stats summary */}
-      <div className="flex items-center justify-between px-4 text-xs font-medium text-apple-secondary dark:text-neutral-400">
-        <span>Showing {filteredEvents.length} renewal events</span>
-        <span>
-          Total expected in window: <strong className="text-apple-text dark:text-white font-semibold">{formatCurrency(windowTotal, currency)}</strong>
-        </span>
-      </div>
+      {/* Month Strip MonAI Summary Pills */}
+      {groupedEvents.length > 0 && (
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+          {groupedEvents.map((g) => (
+            <MonaiPill key={g.monthName} active={true} className="text-xs font-black py-2 px-4 shrink-0">
+              📅 {g.monthName}: {formatCurrency(g.monthTotal, currency)}
+            </MonaiPill>
+          ))}
+        </div>
+      )}
 
-      {/* Timeline Events List */}
+      {/* Timeline ListGroups */}
       {groupedEvents.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-[#16161A] rounded-3xl border border-apple-border dark:border-white/10 p-8 space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-apple-bg dark:bg-neutral-800 flex items-center justify-center text-apple-tertiary dark:text-neutral-400 mx-auto">
-            <Sparkles className="w-6 h-6" />
+        <div className="text-center py-20 bg-[var(--surface)] rounded-[32px] border border-[var(--border)] p-8 space-y-3">
+          <div className="w-16 h-16 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-3xl mx-auto shadow-sm">
+            🗓️
           </div>
-          <h3 className="font-semibold text-apple-text dark:text-white text-sm">No charges scheduled</h3>
-          <p className="text-xs text-apple-secondary dark:text-neutral-400 max-w-sm mx-auto">
+          <h3 className="font-black text-[var(--text-primary)] text-lg">No charges scheduled</h3>
+          <p className="text-xs font-bold text-[var(--text-secondary)] max-w-sm mx-auto">
             You don't have any subscription renewals in the selected time window.
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {groupedEvents.map((group) => (
             <div key={group.monthName} className="space-y-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-apple-secondary dark:text-neutral-400 px-2">
-                {group.monthName}
-              </h3>
+              {/* ListGroup Month Header */}
+              <div className="flex items-center justify-between px-2">
+                <MonaiPill variant="default" className="text-xs font-black uppercase tracking-wider">
+                  {group.monthName} ({group.events.length})
+                </MonaiPill>
 
-              <div className="space-y-2.5">
+                <MonaiPill variant="tag" className="text-xs font-bold">
+                  Total: {formatCurrency(group.monthTotal, currency)}
+                </MonaiPill>
+              </div>
+
+              {/* Events inside Month */}
+              <div className="space-y-3">
                 {group.events.map((event) => {
                   const isTrial = event.status === "TRIAL";
-                  const isHighCost = event.price >= 50;
+                  const icon = event.icon || getAutoEmoji(event.name, event.category);
 
                   return (
                     <div
                       key={event.id}
-                      className="bg-white dark:bg-[#16161A] rounded-2xl p-4 border border-apple-border dark:border-white/10 shadow-apple flex items-center justify-between gap-4 transition-all hover:border-blue-200"
+                      className="bg-[var(--surface)] rounded-[28px] p-5 border border-[var(--border)] shadow-xl flex items-center justify-between gap-4 transition-all hover:border-white/20"
                     >
-                      {/* Left: Date pill & Name */}
-                      <div className="flex items-center gap-4">
-                        <div className="flex flex-col items-center justify-center w-12 h-12 rounded-2xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 shrink-0">
-                          <span className="text-[10px] font-medium uppercase text-apple-tertiary dark:text-neutral-400">
+                      {/* Left: Date Box & Details */}
+                      <div className="flex items-center gap-4 min-w-0">
+                        {/* MonAI Date Box */}
+                        <div className="flex flex-col items-center justify-center w-14 h-14 rounded-[20px] bg-[var(--surface-elevated)] border border-[var(--border)] shrink-0 shadow-sm">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-secondary)]">
                             {format(event.renewalDate, "MMM")}
                           </span>
-                          <span className="text-base font-bold text-apple-text dark:text-white">
+                          <span className="text-xl font-black text-[var(--text-primary)] leading-none mt-0.5">
                             {format(event.renewalDate, "dd")}
                           </span>
                         </div>
 
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-apple-text dark:text-white text-sm">{event.name}</h4>
+                        <MonaiAvatar emoji={icon} size="md" isRecurring={true} />
+
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate">
+                              {event.name}
+                            </h4>
                             {isTrial && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-semibold flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
+                              <MonaiPill variant="amber" className="text-[10px] py-0.5 px-2">
                                 Trial Expiry
-                              </span>
-                            )}
-                            {isHighCost && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-medium">
-                                High Value
-                              </span>
+                              </MonaiPill>
                             )}
                           </div>
-                          <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
+                          <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 truncate">
                             {event.provider} • {event.category}
                           </p>
                         </div>
                       </div>
 
-                      {/* Right: Days countdown & Price */}
-                      <div className="text-right flex items-center gap-3">
-                        <div>
-                          <div className="font-semibold text-apple-text dark:text-white text-sm">
-                            {formatCurrency(event.price, currency)}
-                          </div>
-                          <div className="text-[11px] text-apple-tertiary dark:text-neutral-400">
-                            {event.daysUntil === 0
+                      {/* Right: Days countdown & MonAI AmountPill */}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <MonaiAmountPill
+                          amount={formatCurrency(event.price, currency)}
+                          prefix="⊖"
+                          subtitle={
+                            event.daysUntil === 0
                               ? "Renews Today"
-                              : `in ${event.daysUntil} day${event.daysUntil > 1 ? "s" : ""}`}
-                          </div>
-                        </div>
+                              : `in ${event.daysUntil} day${event.daysUntil > 1 ? "s" : ""}`
+                          }
+                        />
 
                         {event.cancelUrl && (
                           <a
                             href={event.cancelUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 rounded-xl text-apple-tertiary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white hover:bg-apple-bg dark:hover:bg-neutral-800 transition shrink-0"
+                            className="p-2.5 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition shrink-0 monai-press active:scale-90"
                             title="Direct cancellation URL"
                           >
                             <ExternalLink className="w-4 h-4" />

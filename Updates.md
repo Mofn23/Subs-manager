@@ -162,6 +162,19 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
 - **Decisiones de diseño**: Se transformó el modal flotante en un **MonAI Sheet Fullscreen deslizable** con top radius 32px, título 32px `w900`, botón `⊗` circular 48px, selector de emojis en grid de squircles `22%`, placeholders gigantes para Proveedor y Monto, chips horizontales con emoji para Categorías, selector de Ciclo con checklist `✓` y botón gigante `✓ Save` coral. Preservación 100% de Zod + React Hook Form.
 - **Cómo verificar**: Abrir el formulario de agregar/editar suscripción y verificar la animación `sheetSlideUp` 240ms y la cuadrícula de squircles de emojis.
 
+---
+
+## [Rediseño MonAI - F5] - 2026-08-08 (Timeline View MonAI) - COMPLETADO ✅
+
+- **Fase**: F5 - Timeline View MonAI (`/timeline`)
+- **Archivos cambiados**: `src/app/timeline/TimelineView.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se rediseñó la línea de tiempo al estilo MonAI:
+  - **Header Card**: Título `w900`, ícono `CalendarIcon` coral y selector de horizonte temporal en `SegmentedPills`.
+  - **Month Strip**: Cápsulas horizontales MonAI con el total proyectado por mes.
+  - **ListGroups por fecha**: Agrupación por mes con pills de totales por grupo, cajas de fecha MonAI (`dd` prominente `w900`), `MonaiAvatar` emoji y `MonaiAmountPill` a la derecha.
+- **Cómo verificar**: Navegar a `/timeline` en la app y probar los diferentes horizontes (7d, 30d, 90d, 1y).
+
+
 
 
 
