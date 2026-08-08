@@ -153,5 +153,15 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
   - **BottomNav**: Barra flotante inferior con 4 íconos Lucide.
 - **Cómo verificar**: Ejecutar `npm run test` y verificar en el navegador la renderización pixel-perfect del Dashboard en modo oscuro y claro.
 
+---
+
+## [Rediseño MonAI - F4] - 2026-08-08 (Sheet Agregar/Editar + Emoji Picker Squircle) - COMPLETADO ✅
+
+- **Fase**: F4 - Sheet Agregar/Editar & Emoji Picker Squircle MonAI
+- **Archivos cambiados**: `src/components/modals/SubscriptionModal.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se transformó el modal flotante en un **MonAI Sheet Fullscreen deslizable** con top radius 32px, título 32px `w900`, botón `⊗` circular 48px, selector de emojis en grid de squircles `22%`, placeholders gigantes para Proveedor y Monto, chips horizontales con emoji para Categorías, selector de Ciclo con checklist `✓` y botón gigante `✓ Save` coral. Preservación 100% de Zod + React Hook Form.
+- **Cómo verificar**: Abrir el formulario de agregar/editar suscripción y verificar la animación `sheetSlideUp` 240ms y la cuadrícula de squircles de emojis.
+
+
 
 
