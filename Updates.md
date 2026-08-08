@@ -127,3 +127,13 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
 - **Decisiones de diseño**: Se configuraron las variables CSS nativas para el tema oscuro principal (`--bg-app: #0B0B0D`, `--bg-sheet: #121214`, `--surface: #1C1C1E`, `--surface-elevated: #2A2A2C`, `--green: #34C759`, `--coral: #E8505B`) y su variante clara suave (`--bg-app: #F7F7F5`, `--surface: #FFFFFF`). Importación de la fuente **Nunito** (700/800/900) con fallback en sistema. Animaciones MonAI (`sheetSlideUp` 240ms, `menuScaleIn` 160ms, `monai-press` scale `.97`) y `defaultTheme="dark"`.
 - **Cómo verificar**: Inspeccionar las variables en `globals.css` y verificar que Tailwind extiende los tokens de colores `monai.*` y tipografía `font-sans`.
 
+---
+
+## [Rediseño MonAI - F2] - 2026-08-08 (Componentes Base MonAI) - COMPLETADO ✅
+
+- **Fase**: F2 - Catálogo de Componentes Base MonAI
+- **Archivos cambiados**: `src/components/ui/MonaiPill.tsx`, `src/components/ui/MonaiButton.tsx`, `src/components/ui/MonaiAvatar.tsx`, `src/components/ui/MonaiAmountPill.tsx`, `src/components/ui/MonaiDropdown.tsx`, `src/components/ui/MonaiSheet.tsx`, `src/components/ui/MonaiToggle.tsx`, `src/components/ui/MonaiFAB.tsx`, `src/components/ui/MonaiBottomNav.tsx`, `Updates.md`
+- **Decisiones de diseño**: Creación del catálogo completo de primitivas del sistema de diseño MonAI: pills redondeadas `radius 999`, avatares tintados con badge `↻` recurrente, `AmountPill` para montos, menú `MonaiDropdown` con escala 160ms, `MonaiSheet` fullscreen con top radius 32px y botón `⊗` circular 48px, interruptor iOS `MonaiToggle`, botón flotante `MonaiFAB` coral de 72px y `MonaiBottomNav` flotante.
+- **Cómo verificar**: Ejecución limpia del test suite `npm run test` (4/4 tests pasados).
+
+
