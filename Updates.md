@@ -225,6 +225,33 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
     5. Suite de pruebas unitarias ejecutado con éxito (4/4 tests pasados).
 - **Cómo verificar**: Invocación de `npm run test` y `node node_modules/next/dist/bin/next build`.
 
+---
+
+## [Rediseño MonAI - F10] - 2026-08-08 (Documentación Final, Merge & Deploy Vercel) - COMPLETADO ✅
+
+- **Fase**: F10 - Documentación Final, Merge a Main y Despliegue en Producción Vercel
+- **Archivos cambiados**: `Updates.md`
+- **Registro de Commit Hashes por Fase**:
+  - **F0**: `90d632e` - Inventario y `REDESIGN.md`
+  - **F1**: `8bb821f` - Tokens, CSS Variables & Tipografía Nunito
+  - **F2**: `af1e803` - Catálogo de Componentes Base MonAI (`MonaiPill`, `MonaiAvatar`, `MonaiAmountPill`, `MonaiDropdown`, `MonaiSheet`, `MonaiToggle`, `MonaiFAB`, `MonaiBottomNav`)
+  - **F3**: `776c126` - Dashboard MonAI, `HeroStats` TotalBlock, `AttentionSection`, BarChart y `SubscriptionCard`
+  - **F4**: `957101d` - Fullscreen Sheet Agregar/Editar & Grid Emoji Squircle
+  - **F5**: `6cdefa6` - Timeline View MonAI (`/timeline`)
+  - **F6**: `50bbdab` - Insights View MonAI (`/insights`)
+  - **F7**: `b6159b7` - Cancellation View MonAI (`/cancellation`)
+  - **F8**: `cc1e7f8` - Settings View MonAI (`/settings`) & `SettingsRows`
+  - **F9**: `30f0366` - QA, Regresión Visual/Funcional y Compilación limpia Next.js
+  - **F10**: Merge de `redesign/monai` a `main` y despliegue a Vercel Producción
+- **Resultados del Checklist QA y Regresión**:
+  - ✅ **Preservación DURA de Lógica**: 0 cambios en Prisma Schema, Server Actions (`markSubscriptionAsPaid`), NextAuth, Capacitor 7 y motor financiero `financials.ts`.
+  - ✅ **Estética MonAI**: Tema oscuro principal `#0B0B0D` con variante clara suave `#F7F7F5`, acentos verde `#34C759` y coral `#E8505B`, tipografía Nunito 700/800/900, TotalBlock 68px `w900`, `MonaiSheet` deslizable 240ms, FAB 72px coral y `MonaiBottomNav` flotante.
+  - ✅ **Acción 1-tap `[✓ Pagado]`**: Disponible en el Dashboard, tarjetas y sección de atención.
+  - ✅ **Compilación Next.js**: 14/14 rutas generadas con 0 errores TypeScript o linter.
+  - ✅ **Pruebas Unitarias**: 4/4 tests pasados en `npm run test`.
+- **Pipeline de Vercel & URL**: Repositorio oficial en GitHub (`https://github.com/Mofn23/Subs-manager.git`) con despliegue automatizado por Vercel Git Integration.
+
+
 
 
 
