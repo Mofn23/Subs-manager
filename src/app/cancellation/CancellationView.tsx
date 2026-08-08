@@ -1,12 +1,10 @@
 "use client";
 
 import { updateSubscriptionStatus } from "@/app/actions/subscriptions";
-import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiButton } from "@/components/ui/MonaiButton";
-import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, formatCurrency } from "@/lib/financials";
-import { CheckCircle2, ExternalLink, ShieldAlert, Sparkles, Undo2 } from "lucide-react";
+import { CheckCircle2, ExternalLink, ShieldAlert, Undo2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
 
@@ -70,12 +68,10 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
       </div>
 
       {/* MonAI ListGroup: Ready for Cancellation */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-2">
-          <MonaiPill variant="coral" className="text-xs font-black">
-            ✂️ Ready for Cancellation ({toCancelSubs.length})
-          </MonaiPill>
-        </div>
+      <div className="space-y-2.5">
+        <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--coral)] opacity-80 px-1">
+          ✂️ Ready for Cancellation ({toCancelSubs.length})
+        </h3>
 
         {toCancelSubs.length === 0 ? (
           <div className="text-center py-16 bg-[var(--surface)] rounded-[32px] border border-[var(--border)] p-8 space-y-3">
@@ -88,23 +84,23 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {toCancelSubs.map((sub) => (
               <div
                 key={sub.id}
-                className="bg-[var(--surface)] rounded-[28px] p-6 border border-[var(--border)] shadow-xl space-y-5"
+                className="bg-[var(--surface)] rounded-[24px] p-5 sm:p-6 border border-[var(--border)] shadow-xl space-y-4"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex items-start gap-4 min-w-0">
-                    <MonaiAvatar emoji="✂️" size="lg" isRecurring={true} />
+                    <MonaiAvatar emoji="✂️" size="md" isRecurring={true} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-xl font-black text-[var(--text-primary)] truncate">{sub.name}</h4>
-                        <MonaiPill variant="coral" className="text-[11px] py-0.5 px-2.5">
-                          To Cancel
-                        </MonaiPill>
+                        <h4 className="text-lg font-black text-[var(--text-primary)] truncate">{sub.name}</h4>
+                        <span className="text-xs font-bold text-[var(--coral)]">
+                          • To Cancel
+                        </span>
                       </div>
-                      <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5">
+                      <p className="text-xs font-semibold text-[var(--text-secondary)] mt-0.5">
                         {sub.provider} • {formatCurrency(sub.price, currency)}/{sub.billingCycle.toLowerCase()}
                       </p>
                     </div>
@@ -135,8 +131,8 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
 
                 {/* Steps or Instructions */}
                 {sub.cancelSteps && (
-                  <div className="p-4 rounded-[20px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] space-y-1.5 text-xs">
-                    <div className="font-black text-[var(--text-primary)] text-xs uppercase tracking-wider">
+                  <div className="p-3.5 rounded-[18px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] space-y-1 text-xs">
+                    <div className="font-black text-[var(--text-primary)] text-[11px] uppercase tracking-wider">
                       Cancellation Steps:
                     </div>
                     <p className="text-[var(--text-secondary)] font-semibold whitespace-pre-line leading-relaxed">
@@ -151,19 +147,17 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
       </div>
 
       {/* Verified Canceled History */}
-      <div className="space-y-3 pt-4">
-        <div className="flex items-center justify-between px-2">
-          <MonaiPill variant="tag" className="text-xs font-black">
-            Verified Canceled History ({cancelledSubs.length})
-          </MonaiPill>
-        </div>
+      <div className="space-y-2.5 pt-4">
+        <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-secondary)] opacity-60 px-1">
+          Verified Canceled History ({cancelledSubs.length})
+        </h3>
 
         {cancelledSubs.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {cancelledSubs.map((sub) => (
               <div
                 key={sub.id}
-                className="bg-[var(--surface)] rounded-[24px] p-4 border border-[var(--border-subtle)] flex items-center justify-between gap-4 text-xs"
+                className="bg-[var(--surface)] rounded-[20px] p-4 border border-[var(--border-subtle)] flex items-center justify-between gap-4 text-xs"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <MonaiAvatar emoji="📦" size="sm" isRecurring={false} />
@@ -171,7 +165,7 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
                     <span className="font-black text-[var(--text-primary)] text-sm line-through block truncate">
                       {sub.name}
                     </span>
-                    <p className="text-[11px] font-bold text-[var(--text-secondary)] truncate">
+                    <p className="text-[11px] font-semibold text-[var(--text-secondary)] truncate">
                       Verified canceled • Saved {formatCurrency(sub.price, currency)}/{sub.billingCycle.toLowerCase()}
                     </p>
                   </div>

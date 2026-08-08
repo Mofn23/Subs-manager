@@ -1,9 +1,8 @@
 "use client";
 
-import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
-import { MonaiPill } from "@/components/ui/MonaiPill";
 import { markSubscriptionAsPaid } from "@/app/actions/subscriptions";
-import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
+import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
+import { formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
 import { CheckCircle2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
@@ -41,20 +40,12 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
     return null;
   }
 
-  const groupTotal = attentionItems.reduce((acc, item) => acc + item.sub.price, 0);
-
   return (
-    <div className="space-y-3">
-      {/* MonAI ListGroup Header Pill */}
-      <div className="flex items-center justify-between px-1">
-        <MonaiPill variant="amber" className="text-xs font-black">
-          ⚡ Requires Attention ({attentionItems.length})
-        </MonaiPill>
-
-        <MonaiPill variant="tag" className="text-xs font-bold">
-          7 Days Total: {formatCurrency(groupTotal, currency)}
-        </MonaiPill>
-      </div>
+    <div className="space-y-2.5">
+      {/* Clean subtle section header (NO pill, NO group total) */}
+      <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--amber)] px-1">
+        ⚡ Requires Attention ({attentionItems.length})
+      </h3>
 
       {/* List Rows */}
       <div className="space-y-2.5">
@@ -68,31 +59,31 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
               key={sub.id}
               className="flex items-center justify-between p-4 rounded-[24px] bg-[var(--surface)] border border-[var(--amber)]/40 shadow-lg hover:border-[var(--amber)] transition-all gap-3"
             >
-              {/* Left: MonAI Avatar & Subscription Details */}
+              {/* Left: MonAI Avatar & Details */}
               <div className="flex items-center gap-3.5 min-w-0">
                 <MonaiAvatar emoji={icon} size="md" isRecurring={true} />
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[17px] font-black text-[var(--text-primary)] truncate">
+                    <span className="text-base font-black text-[var(--text-primary)] truncate">
                       {sub.name}
                     </span>
-                    <MonaiPill variant="coral" className="text-[11px] py-0.5 px-2">
-                      {isTrial ? "Trial Ending" : daysText}
-                    </MonaiPill>
+                    <span className="text-xs font-bold text-[var(--coral)]">
+                      • {isTrial ? "Trial Ending" : daysText}
+                    </span>
                   </div>
-                  <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 truncate">
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] truncate mt-0.5">
                     {sub.provider} • {sub.category}
                   </p>
                 </div>
               </div>
 
-              {/* Right: Price & 1-Tap [✓ Pagado] Pill Button */}
+              {/* Right: Price & 1-Tap Circular Mark Paid Button */}
               <div className="flex items-center gap-3 shrink-0">
                 <div className="text-right">
-                  <div className="text-base font-black text-[var(--text-primary)]">
+                  <div className="text-sm font-black text-[var(--text-primary)]">
                     {formattedPrice}
                   </div>
-                  <div className="text-[11px] font-semibold text-[var(--text-secondary)]">
+                  <div className="text-[10px] font-bold text-[var(--text-secondary)]">
                     {sub.billingCycle.toLowerCase()}
                   </div>
                 </div>
@@ -101,11 +92,10 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
                   type="button"
                   onClick={() => handleMarkPaid(sub.id)}
                   disabled={loadingId === sub.id}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--pill-light)] text-[var(--pill-light-text)] text-xs font-extrabold shadow-sm hover:opacity-90 transition-all monai-press active:scale-95 disabled:opacity-50"
-                  title="Marcar como pagada y reiniciar ciclo"
+                  className="w-9 h-9 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--green)] hover:bg-[var(--green)]/20 transition flex items-center justify-center monai-press active:scale-90 disabled:opacity-50"
+                  title="Marcar como pagada"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-[var(--green)] stroke-[2.5]" />
-                  <span>{loadingId === sub.id ? "Saving..." : "⊕ Pagado"}</span>
+                  <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                 </button>
 
                 {sub.cancelUrl && (
@@ -113,7 +103,7 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
                     href={sub.cancelUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-full bg-[var(--tag)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                    className="p-2 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
                     title="Manage / Cancel"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />

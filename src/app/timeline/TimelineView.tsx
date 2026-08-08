@@ -51,11 +51,6 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
     return groups;
   }, [filteredEvents]);
 
-  // Total spend in current timeline window
-  const windowTotal = useMemo(() => {
-    return filteredEvents.reduce((acc, curr) => acc + curr.price, 0);
-  }, [filteredEvents]);
-
   return (
     <div className="space-y-8 max-w-4xl mx-auto pb-24">
       {/* Header MonAI Card */}
@@ -119,22 +114,16 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
           </p>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {groupedEvents.map((group) => (
-            <div key={group.monthName} className="space-y-3">
-              {/* ListGroup Month Header */}
-              <div className="flex items-center justify-between px-2">
-                <MonaiPill variant="default" className="text-xs font-black uppercase tracking-wider">
-                  {group.monthName} ({group.events.length})
-                </MonaiPill>
-
-                <MonaiPill variant="tag" className="text-xs font-bold">
-                  Total: {formatCurrency(group.monthTotal, currency)}
-                </MonaiPill>
-              </div>
+            <div key={group.monthName} className="space-y-2.5">
+              {/* Clean subtle section header (NO group total pill) */}
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-secondary)] opacity-60 px-1">
+                {group.monthName} ({group.events.length})
+              </h3>
 
               {/* Events inside Month */}
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {group.events.map((event) => {
                   const isTrial = event.status === "TRIAL";
                   const icon = event.icon || getAutoEmoji(event.name, event.category);
@@ -142,16 +131,16 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
                   return (
                     <div
                       key={event.id}
-                      className="bg-[var(--surface)] rounded-[28px] p-5 border border-[var(--border)] shadow-xl flex items-center justify-between gap-4 transition-all hover:border-white/20"
+                      className="bg-[var(--surface)] rounded-[24px] p-4 sm:p-5 border border-[var(--border)] shadow-xl flex items-center justify-between gap-4 transition-all hover:border-white/20"
                     >
                       {/* Left: Date Box & Details */}
-                      <div className="flex items-center gap-4 min-w-0">
+                      <div className="flex items-center gap-3.5 min-w-0">
                         {/* MonAI Date Box */}
-                        <div className="flex flex-col items-center justify-center w-14 h-14 rounded-[20px] bg-[var(--surface-elevated)] border border-[var(--border)] shrink-0 shadow-sm">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-secondary)]">
+                        <div className="flex flex-col items-center justify-center w-12 h-12 rounded-[18px] bg-[var(--surface-elevated)] border border-[var(--border)] shrink-0 shadow-sm">
+                          <span className="text-[9px] font-black uppercase tracking-wider text-[var(--text-secondary)]">
                             {format(event.renewalDate, "MMM")}
                           </span>
-                          <span className="text-xl font-black text-[var(--text-primary)] leading-none mt-0.5">
+                          <span className="text-lg font-black text-[var(--text-primary)] leading-none mt-0.5">
                             {format(event.renewalDate, "dd")}
                           </span>
                         </div>
@@ -160,16 +149,16 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
 
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate">
+                            <h4 className="text-base font-black text-[var(--text-primary)] truncate">
                               {event.name}
                             </h4>
                             {isTrial && (
-                              <MonaiPill variant="amber" className="text-[10px] py-0.5 px-2">
-                                Trial Expiry
-                              </MonaiPill>
+                              <span className="text-xs font-bold text-[var(--amber)]">
+                                • Trial Expiry
+                              </span>
                             )}
                           </div>
-                          <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 truncate">
+                          <p className="text-xs font-semibold text-[var(--text-secondary)] truncate mt-0.5">
                             {event.provider} • {event.category}
                           </p>
                         </div>
@@ -192,10 +181,10 @@ export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
                             href={event.cancelUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2.5 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition shrink-0 monai-press active:scale-90"
+                            className="p-2 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition shrink-0 monai-press active:scale-90"
                             title="Direct cancellation URL"
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         )}
                       </div>

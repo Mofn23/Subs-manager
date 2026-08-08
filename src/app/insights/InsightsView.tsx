@@ -3,9 +3,8 @@
 import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiButton } from "@/components/ui/MonaiButton";
-import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, detectSubscriptionLeaks, formatCurrency, getAutoEmoji } from "@/lib/financials";
-import { PieChart, Sparkles, TrendingDown } from "lucide-react";
+import { PieChart } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -75,16 +74,10 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
       </div>
 
       {/* MonAI Subscription Leak Detector ListGroup */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-2">
-          <MonaiPill variant="coral" className="text-xs font-black">
-            👻 Money Leaks Detected ({leaks.lowUsageSubs.length + leaks.expiringTrials.length})
-          </MonaiPill>
-
-          <MonaiPill variant="tag" className="text-xs font-bold">
-            Potential Savings: {formatCurrency(leaks.potentialMonthlySavings, currency)}/mo
-          </MonaiPill>
-        </div>
+      <div className="space-y-2.5">
+        <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--coral)] opacity-80 px-1">
+          👻 Money Leaks Detected ({leaks.lowUsageSubs.length + leaks.expiringTrials.length})
+        </h3>
 
         {leaks.lowUsageSubs.length === 0 && leaks.expiringTrials.length === 0 ? (
           <div className="p-8 rounded-[32px] bg-[var(--surface)] border border-[var(--border)] text-center space-y-3">
@@ -97,28 +90,27 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {leaks.lowUsageSubs.map((sub) => {
               const monthlyCost = calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths);
-              const icon = sub.icon || getAutoEmoji(sub.name, sub.category);
 
               return (
                 <div
                   key={sub.id}
-                  className="bg-[var(--surface)] rounded-[28px] p-5 border border-[var(--coral)]/40 shadow-xl flex items-center justify-between gap-4"
+                  className="bg-[var(--surface)] rounded-[24px] p-4 sm:p-5 border border-[var(--coral)]/40 shadow-xl flex items-center justify-between gap-4"
                 >
-                  <div className="flex items-center gap-4 min-w-0">
+                  <div className="flex items-center gap-3.5 min-w-0">
                     <MonaiAvatar emoji="👻" size="md" isRecurring={true} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate">
                           {sub.name}
                         </h4>
-                        <MonaiPill variant="coral" className="text-[11px] py-0.5 px-2">
-                          Review / Low Usage
-                        </MonaiPill>
+                        <span className="text-xs font-bold text-[var(--coral)]">
+                          • Review / Low Usage
+                        </span>
                       </div>
-                      <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 truncate">
+                      <p className="text-xs font-semibold text-[var(--text-secondary)] mt-0.5 truncate">
                         {sub.provider} • Underutilized expense
                       </p>
                     </div>

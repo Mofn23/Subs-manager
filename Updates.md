@@ -251,6 +251,24 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
   - ✅ **Pruebas Unitarias**: 4/4 tests pasados en `npm run test`.
 - **Pipeline de Vercel & URL**: Repositorio oficial en GitHub (`https://github.com/Mofn23/Subs-manager.git`) con despliegue automatizado por Vercel Git Integration.
 
+---
+
+## [Ajustes Minimalistas y Rediseño Compacto MonAI] - 2026-08-08 - COMPLETADO ✅
+
+- **Archivos cambiados**: `src/components/dashboard/SubscriptionCard.tsx`, `src/app/DashboardView.tsx`, `src/components/dashboard/AttentionSection.tsx`, `src/app/timeline/TimelineView.tsx`, `src/app/insights/InsightsView.tsx`, `src/app/cancellation/CancellationView.tsx`, `src/components/ui/MonaiSheet.tsx`, `Updates.md`
+- **Ajustes de Diseño Aplicados**:
+  1. **Títulos de Grupo y Eliminación de Group Total**: Se eliminó por completo la píldora de `Group Total: $X`. Los títulos de grupo (ej: `RENEWS TODAY / OVERDUE (1)`, `THIS MONTH (5)`) salieron de las píldoras pesadas y pasaron a ser textos limpios, pequeños, elegantes y más opacos fuera de píldoras.
+  2. **Tarjetas de Suscripción Ultra-Compactas (`SubscriptionCard.tsx`)**:
+     - Estado (`ACTIVE`, `TRIAL`, etc.) movido justo al lado de la categoría (`STREAMING • ACTIVE`).
+     - Eliminada la fila inferior gigante del footer.
+     - Acción 1-tap de marcar como pagada transformada en un elegante botón circular verde `[✓]` ubicado directamente debajo del menú de 3 puntos `⋮`.
+     - Fecha de renovación (`Renews in Xd` / `Renews Today`) integrada como texto sutil bajo el proveedor.
+     - Reducción drástica de la altura de la tarjeta sin espacios vacíos.
+  3. **Gráfico de Barras por Categoría Unificado y Delicado**: Rediseñado en una **sola tarjeta unificada** que agrupa todas las categorías con barras verticales mucho más delgadas, delicadas y minimalistas.
+  4. **Prevención de Deslizamiento Horizontal en Formulario de Agregar/Editar (`MonaiSheet.tsx`)**: Desactivado el gesto de deslizamiento horizontal (`touch-action: pan-y`, `overscroll-behavior-x: contain`) para evitar salir del formulario al mover los dedos hacia la izquierda o derecha en móviles.
+- **Cómo verificar**: Invocación de `npm run test` y `node node_modules/next/dist/bin/next build`.
+
+
 
 
 

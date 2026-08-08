@@ -4,7 +4,6 @@ import { markSubscriptionAsPaid, toggleLowUsageFlag, updateSubscriptionStatus } 
 import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiDropdown, MonaiDropdownItem } from "@/components/ui/MonaiDropdown";
-import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
 import { CheckCircle2, Edit2, Flag, MoreVertical, ShieldAlert, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -47,19 +46,6 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
     await updateSubscriptionStatus(subscription.id, "TO_CANCEL");
   };
 
-  const getStatusPillVariant = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "green";
-      case "TRIAL":
-        return "amber";
-      case "TO_CANCEL":
-        return "coral";
-      default:
-        return "tag";
-    }
-  };
-
   const icon = subscription.icon || getAutoEmoji(subscription.name, subscription.category);
   const renewalText =
     daysUntilRenewal < 0
@@ -67,6 +53,19 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
       : daysUntilRenewal === 0
       ? "Renews Today"
       : `Renews in ${daysUntilRenewal}d`;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return "text-[var(--green)]";
+      case "TRIAL":
+        return "text-[var(--amber)]";
+      case "TO_CANCEL":
+        return "text-[var(--coral)]";
+      default:
+        return "text-[var(--text-secondary)]";
+    }
+  };
 
   const menuItems: MonaiDropdownItem[] = [
     {
@@ -106,90 +105,83 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
   ];
 
   return (
-    <div className="bg-[var(--surface)] rounded-[28px] p-5 sm:p-6 border border-[var(--border)] shadow-xl hover:shadow-2xl hover:border-white/20 transition-all duration-200 group relative">
-      <div className="flex items-start justify-between gap-4">
-        {/* Left: MonAI Avatar 64px + Details */}
-        <div className="flex items-start gap-4 min-w-0">
-          <MonaiAvatar emoji={icon} size="lg" isRecurring={true} />
+    <div className="bg-[var(--surface)] rounded-[24px] p-4 sm:p-5 border border-[var(--border)] shadow-lg hover:border-white/20 transition-all duration-200 group relative flex items-center justify-between gap-3">
+      {/* Left: MonAI Avatar 56px + Category & Status beside it + Name + Provider & Renewal date */}
+      <div className="flex items-center gap-3.5 min-w-0">
+        <MonaiAvatar emoji={icon} size="md" isRecurring={true} />
 
-          <div className="min-w-0 pt-0.5">
-            <span className="text-xs font-bold text-[var(--text-secondary)] block uppercase tracking-wider">
-              {subscription.category}
+        <div className="min-w-0">
+          {/* Category & Status beside each other */}
+          <div className="flex items-center gap-2 flex-wrap text-[11px] font-black uppercase tracking-wider text-[var(--text-secondary)]">
+            <span>{subscription.category}</span>
+            <span className={getStatusColor(subscription.status)}>
+              • {subscription.status}
             </span>
+            {flagged && (
+              <span className="text-[var(--amber)]">
+                • 👻 Low Usage
+              </span>
+            )}
+          </div>
 
-            <h4 className="text-lg sm:text-xl font-black text-[var(--text-primary)] tracking-tight truncate mt-0.5">
-              {subscription.name}
-            </h4>
+          {/* Subscription Name */}
+          <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] tracking-tight truncate mt-0.5">
+            {subscription.name}
+          </h4>
 
-            <p className="text-xs font-bold text-[var(--text-secondary)] truncate">
-              {subscription.provider}
-            </p>
-
-            {/* Tag Pills Row (#categoría, #estado, #low_usage) */}
-            <div className="flex items-center gap-1.5 flex-wrap mt-3">
-              <MonaiPill variant={getStatusPillVariant(subscription.status)} className="text-[11px] py-0.5 px-2.5">
-                {subscription.status}
-              </MonaiPill>
-
-              {flagged && (
-                <MonaiPill variant="amber" className="text-[11px] py-0.5 px-2.5">
-                  👻 Low Usage
-                </MonaiPill>
-              )}
-            </div>
+          {/* Provider & Subtle Renewal Date underneath */}
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] truncate mt-0.5">
+            <span className="truncate">{subscription.provider}</span>
+            <span className="opacity-40">•</span>
+            <span className={`text-[11px] font-bold ${daysUntilRenewal <= 0 ? "text-[var(--coral)]" : "opacity-75"}`}>
+              📅 {renewalText}
+            </span>
           </div>
         </div>
+      </div>
 
-        {/* Right: MonAI AmountPill & Options */}
-        <div className="flex items-start gap-2 shrink-0">
-          <MonaiAmountPill
-            amount={formatCurrency(subscription.price, currency)}
-            prefix="⊖"
-            subtitle={
-              subscription.billingCycle === "MONTHLY"
-                ? "/ month"
-                : `${formatCurrency(monthlyEquivalent, currency)}/mo (${subscription.billingCycle.toLowerCase()})`
-            }
-          />
+      {/* Right: Amount & Actions Column (3-dots menu + circular checkmark button under it) */}
+      <div className="flex items-center gap-2.5 shrink-0">
+        <MonaiAmountPill
+          amount={formatCurrency(subscription.price, currency)}
+          prefix="⊖"
+          subtitle={
+            subscription.billingCycle === "MONTHLY"
+              ? "/ month"
+              : `${formatCurrency(monthlyEquivalent, currency)}/mo`
+          }
+        />
 
-          {/* Context Menu Trigger */}
+        <div className="flex flex-col items-center gap-1.5">
+          {/* Menu Trigger */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setShowMenu(!showMenu)}
-              className="w-10 h-10 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition flex items-center justify-center monai-press active:scale-90"
+              className="w-8 h-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition flex items-center justify-center monai-press active:scale-90"
               aria-label="Options"
             >
-              <MoreVertical className="w-4 h-4" />
+              <MoreVertical className="w-3.5 h-3.5" />
             </button>
 
-            {/* MonAI Dropdown */}
             <MonaiDropdown
               isOpen={showMenu}
               onClose={() => setShowMenu(false)}
               items={menuItems}
             />
           </div>
-        </div>
-      </div>
 
-      {/* Footer Row: Renewal countdown + 1-Tap [✓ Pagado] Pill */}
-      <div className="mt-5 pt-3.5 border-t border-[var(--border-subtle)] flex items-center justify-between gap-2">
-        <div className="text-xs font-extrabold text-[var(--text-secondary)] flex items-center gap-1">
-          <span>🗓</span>
-          <span className={daysUntilRenewal <= 0 ? "text-[var(--coral)]" : ""}>{renewalText}</span>
+          {/* 1-Tap Circular Mark Paid Button directly under 3-dots menu */}
+          <button
+            type="button"
+            onClick={handleMarkAsPaid}
+            disabled={isPaidLoading}
+            className="w-8 h-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--green)] hover:bg-[var(--green)]/20 transition flex items-center justify-center monai-press active:scale-90 disabled:opacity-50"
+            title="Marcar como pagada"
+          >
+            <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleMarkAsPaid}
-          disabled={isPaidLoading}
-          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[var(--pill-light)] text-[var(--pill-light-text)] text-xs font-black shadow-sm hover:opacity-90 transition-all monai-press active:scale-95 disabled:opacity-50"
-          title="Marcar como pagada y reiniciar ciclo"
-        >
-          <CheckCircle2 className="w-3.5 h-3.5 text-[var(--green)] stroke-[2.5]" />
-          <span>{isPaidLoading ? "..." : "⊕ Marcar Pagada"}</span>
-        </button>
       </div>
     </div>
   );

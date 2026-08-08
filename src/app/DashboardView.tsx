@@ -10,7 +10,7 @@ import { SubscriptionModal } from "@/components/modals/SubscriptionModal";
 import { MonaiFAB } from "@/components/ui/MonaiFAB";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, calculateSpendSummary, detectSubscriptionLeaks, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
-import { Plus, Search, Sparkles } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -49,7 +49,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
     return detectSubscriptionLeaks(subscriptions);
   }, [subscriptions]);
 
-  // Category breakdown for horizontal MonAI BarChart
+  // Category breakdown for unified MonAI BarChart
   const categoryBarData = useMemo(() => {
     const map: Record<string, { total: number; icon: string; count: number }> = {};
     subscriptions.forEach((sub) => {
@@ -141,15 +141,12 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
       else later.push(sub);
     });
 
-    const groups: { title: string; subs: SubscriptionItem[]; total: number }[] = [];
+    const groups: { title: string; subs: SubscriptionItem[] }[] = [];
 
-    const calcTotal = (items: SubscriptionItem[]) =>
-      items.reduce((acc, s) => acc + s.price, 0);
-
-    if (today.length > 0) groups.push({ title: "Renews Today / Overdue", subs: today, total: calcTotal(today) });
-    if (thisWeek.length > 0) groups.push({ title: "This Week", subs: thisWeek, total: calcTotal(thisWeek) });
-    if (thisMonth.length > 0) groups.push({ title: "This Month", subs: thisMonth, total: calcTotal(thisMonth) });
-    if (later.length > 0) groups.push({ title: "Later", subs: later, total: calcTotal(later) });
+    if (today.length > 0) groups.push({ title: "Renews Today / Overdue", subs: today });
+    if (thisWeek.length > 0) groups.push({ title: "This Week", subs: thisWeek });
+    if (thisMonth.length > 0) groups.push({ title: "This Month", subs: thisMonth });
+    if (later.length > 0) groups.push({ title: "Later", subs: later });
 
     return groups;
   }, [filteredSubscriptions]);
@@ -183,27 +180,28 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
         activeCount={spendSummary.activeCount}
       />
 
-      {/* MonAI Horizontal Scroll BarChart by Category */}
+      {/* Unified MonAI Single-Card Delicate Category BarChart */}
       {categoryBarData.items.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
-              Spend by Category
-            </span>
+        <div className="bg-[var(--surface)] rounded-[28px] p-5 border border-[var(--border)] shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)] opacity-60">
+              Category Spend
+            </h3>
             {selectedCategoryFilter && (
               <MonaiPill
                 variant="coral"
                 onClick={() => setSelectedCategoryFilter(null)}
-                className="text-xs font-extrabold"
+                className="text-[11px] font-extrabold py-0.5 px-2.5"
               >
-                Category: {selectedCategoryFilter} ⊗
+                Filter: {selectedCategoryFilter} ⊗
               </MonaiPill>
             )}
           </div>
 
-          <div className="flex items-end gap-3 overflow-x-auto pb-2 pt-4 px-2 scrollbar-none">
+          {/* All category thin bars sitting side-by-side inside ONE unified card */}
+          <div className="flex items-end justify-between gap-2 overflow-x-auto pb-1 scrollbar-none">
             {categoryBarData.items.map((cat) => {
-              const heightPercent = Math.max(Math.round((cat.total / categoryBarData.maxTotal) * 100), 24);
+              const heightPercent = Math.max(Math.round((cat.total / categoryBarData.maxTotal) * 100), 15);
               const isSelected = selectedCategoryFilter === cat.category;
 
               return (
@@ -214,26 +212,28 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
                     if (isSelected) setSelectedCategoryFilter(null);
                     else setSelectedCategoryFilter(cat.category);
                   }}
-                  className={`flex flex-col items-center justify-end w-24 h-40 rounded-[24px] p-3 transition-all duration-200 shrink-0 monai-press active:scale-95 border ${
-                    isSelected
-                      ? "bg-[#242426] border-[var(--coral)] ring-2 ring-[var(--coral)]/50 shadow-xl"
-                      : "bg-[#1A1A1C] border-[var(--border-subtle)] hover:bg-[#202022]"
+                  className={`flex flex-col items-center gap-1.5 flex-1 min-w-[56px] transition-all duration-150 monai-press active:scale-95 group p-1.5 rounded-2xl ${
+                    isSelected ? "bg-white/10 ring-1 ring-[var(--coral)]" : "hover:bg-white/5"
                   }`}
                 >
-                  {/* Visual Bar height fill inside container */}
-                  <div
-                    className={`w-full rounded-2xl transition-all duration-300 flex flex-col justify-end items-center p-2 mb-2 ${
-                      isSelected ? "bg-[var(--coral)] text-white" : "bg-[var(--surface-elevated)] text-[var(--text-primary)]"
-                    }`}
-                    style={{ height: `${heightPercent}%` }}
-                  />
+                  {/* Amount label */}
+                  <span className="text-[10px] font-black text-[var(--text-secondary)]">
+                    {formatCompactValue(cat.total)}
+                  </span>
 
-                  {/* Icon & compact amount */}
-                  <div className="flex items-center gap-1.5 text-sm font-black text-[var(--text-primary)]">
-                    <span>{cat.icon}</span>
-                    <span className="text-xs">{formatCompactValue(cat.total)}</span>
+                  {/* Thin, delicate vertical bar */}
+                  <div className="w-2.5 sm:w-3.5 h-24 rounded-full bg-[var(--surface-elevated)] border border-[var(--border-subtle)] overflow-hidden flex flex-col justify-end p-[1.5px]">
+                    <div
+                      className={`w-full rounded-full transition-all duration-300 ${
+                        isSelected ? "bg-[var(--coral)]" : "bg-[var(--green)] group-hover:bg-[var(--coral)]"
+                      }`}
+                      style={{ height: `${heightPercent}%` }}
+                    />
                   </div>
-                  <span className="text-[11px] font-bold text-[var(--text-secondary)] truncate w-full text-center mt-0.5">
+
+                  {/* Emoji Icon & Label */}
+                  <span className="text-sm mt-0.5">{cat.icon}</span>
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)] truncate max-w-[54px] text-center">
                     {cat.category}
                   </span>
                 </button>
@@ -247,9 +247,9 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
       <AttentionSection subscriptions={subscriptions} currency={currency} />
 
       {/* Subscriptions List Control Section */}
-      <div className="space-y-5">
+      <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Your Subscriptions</h2>
+          <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tight">Your Subscriptions</h2>
 
           {/* Search Box MonAI style */}
           <div className="relative w-full sm:w-72">
@@ -259,7 +259,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
               placeholder="Search provider, category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-full bg-[var(--surface)] border border-[var(--border)] text-xs font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-[var(--text-placeholder)] shadow-inner"
+              className="w-full pl-11 pr-4 py-2 rounded-full bg-[var(--surface)] border border-[var(--border)] text-xs font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-[var(--text-placeholder)] shadow-inner"
             />
           </div>
         </div>
@@ -292,22 +292,16 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
             </button>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {groupedSubscriptions.map((group) => (
-              <div key={group.title} className="space-y-3">
-                {/* ListGroup Header */}
-                <div className="flex items-center justify-between px-2">
-                  <MonaiPill variant="default" className="text-xs font-black uppercase tracking-wider">
-                    {group.title} ({group.subs.length})
-                  </MonaiPill>
-
-                  <MonaiPill variant="tag" className="text-xs font-bold">
-                    Group Total: {formatCurrency(group.total, currency)}
-                  </MonaiPill>
-                </div>
+              <div key={group.title} className="space-y-2.5">
+                {/* Clean, subtle section header (NO pill, NO Group Total) */}
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-secondary)] opacity-60 px-1 pt-2">
+                  {group.title} ({group.subs.length})
+                </h3>
 
                 {/* Subscriptions Grid inside group */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   {group.subs.map((sub) => (
                     <SubscriptionCard
                       key={sub.id}
@@ -327,7 +321,7 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
         )}
       </div>
 
-      {/* Floating Action Button (MonAI Coral 76px FAB) */}
+      {/* Floating Action Button (MonAI Coral 72px FAB) */}
       <MonaiFAB
         onClick={() => {
           setEditingSub(null);
