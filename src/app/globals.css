@@ -1,33 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", sans-serif;
+  /* MonAI Dark Mode (Primary Default) */
+  --bg-app: #0B0B0D;
+  --bg-sheet: #121214;
+  --surface: #1C1C1E;
+  --surface-elevated: #2A2A2C;
+  --tag: #1E1E20;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --text-primary: #F5F5F7;
+  --text-secondary: #8E8E93;
+  --text-placeholder: #3A3A3C;
+  --green: #34C759;
+  --coral: #E8505B;
+  --pill-light: #E9E9EC;
+  --pill-light-text: #1C1C1E;
+  --amber: #F59E0B;
+  --amber-soft: rgba(245, 158, 11, 0.15);
+
+  --font-nunito: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html:not(.light) {
+  --bg-app: #0B0B0D;
+  --bg-sheet: #121214;
+  --surface: #1C1C1E;
+  --surface-elevated: #2A2A2C;
+  --tag: #1E1E20;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --text-primary: #F5F5F7;
+  --text-secondary: #8E8E93;
+  --text-placeholder: #3A3A3C;
+  --green: #34C759;
+  --coral: #E8505B;
+  --pill-light: #E9E9EC;
+  --pill-light-text: #1C1C1E;
+  --amber: #F59E0B;
+  --amber-soft: rgba(245, 158, 11, 0.15);
+  background-color: #0B0B0D;
+  color: #F5F5F7;
+}
+
+html.light {
+  --bg-app: #F7F7F5;
+  --bg-sheet: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-elevated: #E9E9EC;
+  --tag: #E9E9EC;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --text-primary: #1C1C1E;
+  --text-secondary: #6E6E73;
+  --text-placeholder: #8E8E93;
+  --green: #34C759;
+  --coral: #E8505B;
+  --pill-light: #1C1C1E;
+  --pill-light-text: #F5F5F7;
+  --amber: #D97706;
+  --amber-soft: rgba(217, 119, 6, 0.12);
+  background-color: #F7F7F5;
+  color: #1C1C1E;
 }
 
 html {
   overscroll-behavior-y: none;
-  background-color: #FAFAF9;
-}
-
-html.dark {
-  background-color: #0C0C0E;
+  font-family: var(--font-nunito);
 }
 
 body {
-  font-family: var(--font-apple);
-  background-color: #FAFAF9;
-  color: #1C1C1E;
+  font-family: var(--font-nunito);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
   transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.dark body {
-  background-color: #0C0C0E;
-  color: #FFFFFF;
 }
 
 /* Completely hide all scrollbars across all elements for a native app feel */
@@ -40,4 +93,49 @@ body {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+/* MonAI Keyframe Animations */
+@keyframes sheetSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes menuScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-sheet-slide-up {
+  animation: sheetSlideUp 240ms cubic-bezier(0.32, 0.72, 0.28, 1) forwards;
+}
+
+.animate-menu-scale-in {
+  animation: menuScaleIn 160ms ease-out forwards;
+}
+
+.monai-press {
+  transition: transform 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+.monai-press:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

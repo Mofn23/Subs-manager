@@ -117,3 +117,13 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
 - **Archivos cambiados**: `REDESIGN.md`, `Updates.md`
 - **Decisiones de diseño**: Se realizó un inventario completo de las 6 vistas principales (`/`, `/timeline`, `/insights`, `/cancellation`, `/settings`, `/login`), componentes del dashboard, modales, layout y servidor. Se trazó la matriz de equivalencias hacia el sistema visual MonAI (dark mode principal `#0B0B0D`, tarjetas `#1C1C1E`, acentos verde `#34C759` y coral `#E8505B`, tipografía Nunito 700/800/900, pills redondeadas, TotalBlock con número gigante `w900`, FABs flotantes y bottom nav).
 - **Cómo verificar**: Consultar `REDESIGN.md` en la raíz del proyecto para la matriz de componentes y reglas duras de preservación.
+
+---
+
+## [Rediseño MonAI - F1] - 2026-08-08 (Tokens, CSS Variables & Motion) - COMPLETADO ✅
+
+- **Fase**: F1 - Tokens, CSS Variables, Tailwind Config y Tipografía Nunito
+- **Archivos cambiados**: `src/app/globals.css`, `tailwind.config.ts`, `src/components/common/ThemeProvider.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se configuraron las variables CSS nativas para el tema oscuro principal (`--bg-app: #0B0B0D`, `--bg-sheet: #121214`, `--surface: #1C1C1E`, `--surface-elevated: #2A2A2C`, `--green: #34C759`, `--coral: #E8505B`) y su variante clara suave (`--bg-app: #F7F7F5`, `--surface: #FFFFFF`). Importación de la fuente **Nunito** (700/800/900) con fallback en sistema. Animaciones MonAI (`sheetSlideUp` 240ms, `menuScaleIn` 160ms, `monai-press` scale `.97`) y `defaultTheme="dark"`.
+- **Cómo verificar**: Inspeccionar las variables en `globals.css` y verificar que Tailwind extiende los tokens de colores `monai.*` y tipografía `font-sans`.
+
