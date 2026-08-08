@@ -6,12 +6,22 @@
   --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", sans-serif;
 }
 
+html {
+  overscroll-behavior-y: none;
+  background-color: #FAFAF9;
+}
+
+html.dark {
+  background-color: #0C0C0E;
+}
+
 body {
   font-family: var(--font-apple);
   background-color: #FAFAF9;
   color: #1C1C1E;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -20,29 +30,14 @@ body {
   color: #FFFFFF;
 }
 
-/* Custom minimal scrollbar */
+/* Completely hide all scrollbars across all elements for a native app feel */
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 9999px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
