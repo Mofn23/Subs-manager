@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteAccount, exportUserData, updateUserSettings } from "@/app/actions/subscriptions";
+import { deleteAccount, exportUserData, updateUserSettings } from "@/app/actions/auth";
 import { MonaiButton } from "@/components/ui/MonaiButton";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { MonaiToggle } from "@/components/ui/MonaiToggle";

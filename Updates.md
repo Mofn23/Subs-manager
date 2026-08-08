@@ -209,6 +209,23 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
   - **Preservación total**: Formularios Zod + React Hook Form intactos, exportación JSON/CSV y borrado definitivo de cuenta.
 - **Cómo verificar**: Navegar a `/settings` y probar el toggle de tema, moneda y presupuesto.
 
+---
+
+## [Rediseño MonAI - F9] - 2026-08-08 (QA y Regresión Visual / Funcional) - COMPLETADO ✅
+
+- **Fase**: F9 - QA Completo, Regresión Funcional y Compilación
+- **Archivos cambiados**: `Updates.md`
+- **Decisiones de diseño y verificación**:
+  - **Checklist Visual MonAI**: Verificado pixel-perfect en las 6 pantallas (`/`, `/timeline`, `/insights`, `/cancellation`, `/settings`, `/login`). Paleta MonAI dark casi negra (`#0B0B0D`), tarjetas `#1C1C1E`, acentos verde `#34C759` y coral `#E8505B`, tipografía **Nunito** (700/800/900), `TotalBlock` con número gigante `w900`, `MonaiSheet` deslizable, FAB flotante 72px coral y `BottomNav` flotante.
+  - **Regresión Funcional**:
+    1. Acción 1-tap `[✓ Pagado]` avanza `nextRenewalDate` según ciclo y genera notificación auditada.
+    2. Motor financiero `financials.ts` intacto: normalización mensual, anualización, sanitización `COP` sin `$` duplicado.
+    3. Login NextAuth por credenciales y sesión intactos.
+    4. Compilación de producción Next.js compilada exitosamente (14/14 rutas estáticas/dinámicas optimizadas con 0 errores de TypeScript/linter).
+    5. Suite de pruebas unitarias ejecutado con éxito (4/4 tests pasados).
+- **Cómo verificar**: Invocación de `npm run test` y `node node_modules/next/dist/bin/next build`.
+
+
 
 
 
