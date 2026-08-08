@@ -1,8 +1,8 @@
 "use client";
 
-import { toggleLowUsageFlag, updateSubscriptionStatus } from "@/app/actions/subscriptions";
+import { markSubscriptionAsPaid, toggleLowUsageFlag, updateSubscriptionStatus } from "@/app/actions/subscriptions";
 import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
-import { AlertCircle, Calendar, ExternalLink, Flag, MoreVertical, Edit2, Trash2, ShieldAlert } from "lucide-react";
+import { AlertCircle, Calendar, ExternalLink, Flag, MoreVertical, Edit2, Trash2, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 
 interface SubscriptionCardProps {
@@ -15,6 +15,7 @@ interface SubscriptionCardProps {
 export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: SubscriptionCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [flagged, setFlagged] = useState(subscription.flaggedLowUsage);
+  const [isPaidLoading, setIsPaidLoading] = useState(false);
 
   const monthlyEquivalent = calculateMonthlyEquivalent(
     subscription.price,
@@ -23,6 +24,13 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
   );
 
   const daysUntilRenewal = getDaysUntil(subscription.nextRenewalDate);
+
+  const handleMarkAsPaid = async () => {
+    setShowMenu(false);
+    setIsPaidLoading(true);
+    await markSubscriptionAsPaid(subscription.id);
+    setIsPaidLoading(false);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -95,7 +103,16 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
 
             {/* Context Dropdown */}
             {showMenu && (
-              <div className="absolute right-0 mt-1 w-44 bg-white dark:bg-[#1C1C22] rounded-xl shadow-apple-modal border border-apple-border dark:border-white/15 py-1.5 z-30 text-xs animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-[#1C1C22] rounded-xl shadow-apple-modal border border-apple-border dark:border-white/15 py-1.5 z-30 text-xs animate-in fade-in zoom-in-95">
+                <button
+                  onClick={handleMarkAsPaid}
+                  disabled={isPaidLoading}
+                  className="w-full text-left px-3.5 py-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center gap-2 font-medium border-b border-apple-border dark:border-white/10 transition-colors"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  {isPaidLoading ? "Reiniciando..." : "Marcar como pagada"}
+                </button>
+
                 <button
                   onClick={() => {
                     setShowMenu(false);
@@ -156,16 +173,28 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
           )}
         </div>
 
-        {/* Right: Next Renewal Date */}
+        {/* Right: Renewal & Quick Mark Paid */}
         <div className="flex items-center gap-2 text-apple-tertiary dark:text-neutral-400 text-[11px]">
-          <Calendar className="w-3.5 h-3.5" />
-          <span>
-            {daysUntilRenewal < 0
-              ? "Overdue"
-              : daysUntilRenewal === 0
-              ? "Renews Today"
-              : `Renews in ${daysUntilRenewal}d`}
-          </span>
+          <div className="flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>
+              {daysUntilRenewal < 0
+                ? "Overdue"
+                : daysUntilRenewal === 0
+                ? "Renews Today"
+                : `Renews in ${daysUntilRenewal}d`}
+            </span>
+          </div>
+
+          <button
+            onClick={handleMarkAsPaid}
+            disabled={isPaidLoading}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold border border-emerald-500/30 transition-all active:scale-95 disabled:opacity-50 ml-1"
+            title="Marcar como pagada y reiniciar ciclo"
+          >
+            <CheckCircle2 className="w-3 h-3" />
+            <span>{isPaidLoading ? "..." : "Marcar Pagada"}</span>
+          </button>
           {(subscription as any).cancelUrl && (
             <a
               href={(subscription as any).cancelUrl}

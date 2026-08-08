@@ -1,11 +1,11 @@
 "use client";
 
-import { createSubscription, updateSubscription } from "@/app/actions/subscriptions";
+import { createSubscription, markSubscriptionAsPaid, updateSubscription } from "@/app/actions/subscriptions";
 import { getAutoEmoji, SubscriptionItem } from "@/lib/financials";
 import { subscriptionSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Sparkles, X } from "lucide-react";
+import { CheckCircle2, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,6 +29,15 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState("🍿");
   const [hasCustomIcon, setHasCustomIcon] = useState(false);
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+
+  const handleQuickMarkPaid = async () => {
+    if (!subscriptionToEdit) return;
+    setIsMarkingPaid(true);
+    await markSubscriptionAsPaid(subscriptionToEdit.id);
+    setIsMarkingPaid(false);
+    onClose();
+  };
 
   const categories = [
     "Streaming",
@@ -355,21 +364,37 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
           </div>
 
           {/* Footer Buttons */}
-          <div className="pt-4 flex items-center justify-end gap-2 border-t border-apple-border dark:border-white/10">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl text-xs font-medium bg-apple-text dark:bg-white text-white dark:text-black hover:opacity-90 transition shadow-apple disabled:opacity-50"
-            >
-              {isSubmitting ? "Saving..." : subscriptionToEdit ? "Save Changes" : "Create Subscription"}
-            </button>
+          <div className="pt-4 flex items-center justify-between gap-2 border-t border-apple-border dark:border-white/10">
+            {subscriptionToEdit ? (
+              <button
+                type="button"
+                onClick={handleQuickMarkPaid}
+                disabled={isMarkingPaid}
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{isMarkingPaid ? "Reiniciando..." : "Marcar como Pagada"}</span>
+              </button>
+            ) : (
+              <div />
+            )}
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl text-xs font-medium text-apple-secondary dark:text-neutral-400 hover:text-apple-text dark:hover:text-white transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-5 py-2 rounded-xl text-xs font-medium bg-apple-text dark:bg-white text-white dark:text-black hover:opacity-90 transition shadow-apple disabled:opacity-50"
+              >
+                {isSubmitting ? "Saving..." : subscriptionToEdit ? "Save Changes" : "Create Subscription"}
+              </button>
+            </div>
           </div>
         </form>
       </div>

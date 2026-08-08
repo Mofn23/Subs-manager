@@ -196,3 +196,78 @@ export async function updateSubscriptionStatus(
     return { error: err?.message || "Failed to update status" };
   }
 }
+
+export async function markSubscriptionAsPaid(id: string) {
+  try {
+    const user = await getCurrentUser();
+    if (!user || !user.id) return { error: "Unauthorized" };
+
+    const subscription = await prisma.subscription.findFirst({
+      where: { id, userId: user.id },
+    });
+
+    if (!subscription) return { error: "Subscription not found" };
+
+    const currentDate = new Date();
+    const baseDate = subscription.nextRenewalDate < currentDate ? currentDate : new Date(subscription.nextRenewalDate);
+    const nextDate = new Date(baseDate);
+
+    switch (subscription.billingCycle) {
+      case "WEEKLY":
+        nextDate.setDate(nextDate.getDate() + 7);
+        break;
+      case "BIWEEKLY":
+        nextDate.setDate(nextDate.getDate() + 14);
+        break;
+      case "MONTHLY":
+        nextDate.setMonth(nextDate.getMonth() + 1);
+        break;
+      case "QUARTERLY":
+        nextDate.setMonth(nextDate.getMonth() + 3);
+        break;
+      case "SEMESTRIAL":
+        nextDate.setMonth(nextDate.getMonth() + 6);
+        break;
+      case "YEARLY":
+        nextDate.setFullYear(nextDate.getFullYear() + 1);
+        break;
+      case "CUSTOM":
+        nextDate.setMonth(nextDate.getMonth() + (subscription.customIntervalMonths || 1));
+        break;
+      default:
+        nextDate.setMonth(nextDate.getMonth() + 1);
+        break;
+    }
+
+    const updated = await prisma.subscription.update({
+      where: { id },
+      data: {
+        nextRenewalDate: nextDate,
+        updatedAt: new Date(),
+      },
+    });
+
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: user.id,
+          title: "Pago Registrado",
+          message: `Suscripción "${subscription.name}" marcada como pagada. Próxima renovación: ${nextDate.toLocaleDateString()}`,
+          type: "INFO",
+          read: false,
+        },
+      });
+    } catch (e) {
+      // Ignore notification creation error
+    }
+
+    revalidatePath("/");
+    revalidatePath("/timeline");
+    revalidatePath("/insights");
+    revalidatePath("/cancellation");
+    return { success: true, subscription: updated };
+  } catch (err: any) {
+    console.error("Error marking subscription as paid:", err);
+    return { error: err?.message || "Failed to mark as paid" };
+  }
+}
