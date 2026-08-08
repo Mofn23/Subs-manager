@@ -118,8 +118,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.1.5-ipa
-          name: Subs Manager iOS Native IPA (v1.1.5)
+          tag_name: v1.1.6-ipa
+          name: Subs Manager iOS Native IPA (v1.1.6)
           body: |
             ## 📱 Subs Manager iOS Native IPA Package for SideStore / AltStore
             
