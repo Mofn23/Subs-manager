@@ -1,9 +1,12 @@
 "use client";
 
-import { deleteAccount, exportUserData, updateUserSettings } from "@/app/actions/auth";
+import { deleteAccount, exportUserData, updateUserSettings } from "@/app/actions/subscriptions";
+import { MonaiButton } from "@/components/ui/MonaiButton";
+import { MonaiPill } from "@/components/ui/MonaiPill";
+import { MonaiToggle } from "@/components/ui/MonaiToggle";
 import { userSettingsSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Download, FileJson, FileSpreadsheet, Laptop, Moon, Settings, ShieldAlert, Sparkles, Sun, Trash2 } from "lucide-react";
+import { FileJson, FileSpreadsheet, Laptop, Moon, Settings, ShieldAlert, Sun, Trash2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -15,6 +18,8 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
   const [mounted, setMounted] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -46,11 +51,11 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
     setSuccessMsg("");
     setErrorMsg("");
     const res = await updateUserSettings(data);
-    if (res.error) {
+    if (res?.error) {
       setErrorMsg(res.error);
     } else {
       await update({ currency: data.currency, monthlyBudget: data.monthlyBudget });
-      setSuccessMsg("Settings updated successfully.");
+      setSuccessMsg("Preferences updated successfully.");
     }
   };
 
@@ -99,190 +104,236 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
   };
 
   const handleDeleteAccount = async () => {
-    if (confirm("CRITICAL WARNING: Are you sure you want to delete your account and all associated subscriptions permanently? This action CANNOT be undone.")) {
+    if (confirm("CRITICAL WARNING: Are you sure you want to delete your account permanently? This action CANNOT be undone.")) {
       await deleteAccount();
       signOut({ callbackUrl: "/login" });
     }
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple">
-        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-apple-secondary dark:text-neutral-400 mb-1">
-          <Settings className="w-3.5 h-3.5 text-apple-tertiary dark:text-neutral-500" />
-          Preferences & Data Sovereignty
+    <div className="space-y-8 max-w-3xl mx-auto pb-24">
+      {/* Header MonAI Card */}
+      <div className="bg-[var(--surface)] rounded-[32px] p-8 border border-[var(--border)] shadow-2xl">
+        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] mb-2">
+          <Settings className="w-4 h-4 text-[var(--coral)] stroke-[2.5]" />
+          Account & Preferences
         </div>
-        <h1 className="text-2xl font-semibold text-apple-text dark:text-white tracking-tight">Account Settings</h1>
-        <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
-          Manage theme preferences, currency standards, target monthly budget limit, and full data privacy.
+        <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Settings</h1>
+        <p className="text-xs font-bold text-[var(--text-secondary)] mt-1">
+          Manage currency, theme, monthly budget, notifications, and data sovereignty.
         </p>
       </div>
 
-      {/* Theme Preference Cards Section */}
-      <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple space-y-4">
-        <h3 className="font-semibold text-apple-text dark:text-white text-sm pb-2 border-b border-apple-border dark:border-white/10">
-          Appearance & Theme Mode
+      {/* MonAI SettingsRows Group: General Preferences & Theme */}
+      <div className="bg-[var(--surface)] rounded-[32px] p-6 sm:p-8 border border-[var(--border)] shadow-2xl space-y-6">
+        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--text-secondary)] pb-2 border-b border-[var(--border-subtle)]">
+          Appearance & Themes
         </h3>
-        <p className="text-xs text-apple-secondary dark:text-neutral-400">
-          Choose your preferred visual theme style across all devices.
-        </p>
 
-        {mounted && (
-          <div className="grid grid-cols-3 gap-3 pt-1">
-            <button
-              type="button"
-              onClick={() => setTheme("light")}
-              className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all ${
-                theme === "light"
-                  ? "bg-blue-50/80 dark:bg-blue-500/20 border-blue-500 text-blue-600 dark:text-blue-400 font-semibold ring-2 ring-blue-500/30"
-                  : "bg-apple-bg dark:bg-neutral-800 border-apple-border dark:border-white/10 text-apple-text dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-              }`}
-            >
-              <Sun className="w-5 h-5 text-amber-500" />
-              <span className="text-xs">Light Mode ☀️</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTheme("dark")}
-              className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all ${
-                theme === "dark"
-                  ? "bg-blue-50/80 dark:bg-blue-500/20 border-blue-500 text-blue-600 dark:text-blue-400 font-semibold ring-2 ring-blue-500/30"
-                  : "bg-apple-bg dark:bg-neutral-800 border-apple-border dark:border-white/10 text-apple-text dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-              }`}
-            >
-              <Moon className="w-5 h-5 text-indigo-400" />
-              <span className="text-xs">Dark Mode 🌙</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTheme("system")}
-              className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all ${
-                theme === "system"
-                  ? "bg-blue-50/80 dark:bg-blue-500/20 border-blue-500 text-blue-600 dark:text-blue-400 font-semibold ring-2 ring-blue-500/30"
-                  : "bg-apple-bg dark:bg-neutral-800 border-apple-border dark:border-white/10 text-apple-text dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-              }`}
-            >
-              <Laptop className="w-5 h-5 text-apple-tertiary dark:text-neutral-400" />
-              <span className="text-xs">System 💻</span>
-            </button>
+        {/* MonAI SettingsRow: Theme Selector */}
+        <div className="flex items-center justify-between gap-4 p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-[var(--tag)] text-2xl flex items-center justify-center shrink-0 border border-[var(--border)]">
+              🎨
+            </div>
+            <div>
+              <h4 className="text-[17px] font-black text-[var(--text-primary)]">Visual Theme</h4>
+              <p className="text-xs font-bold text-[var(--text-secondary)]">Choose dark or soft light theme</p>
+            </div>
           </div>
-        )}
+
+          {mounted && (
+            <div className="flex items-center gap-1.5 p-1 bg-[var(--tag)] rounded-full border border-[var(--border)] w-full sm:w-auto justify-center">
+              <button
+                type="button"
+                onClick={() => setTheme("dark")}
+                className={`px-3 py-1.5 rounded-full text-xs font-black transition-all ${
+                  theme === "dark" ? "bg-[var(--surface-elevated)] text-white shadow-sm" : "text-[var(--text-secondary)]"
+                }`}
+              >
+                🌙 Dark
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme("light")}
+                className={`px-3 py-1.5 rounded-full text-xs font-black transition-all ${
+                  theme === "light" ? "bg-white text-black shadow-sm" : "text-[var(--text-secondary)]"
+                }`}
+              >
+                ☀️ Light
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme("system")}
+                className={`px-3 py-1.5 rounded-full text-xs font-black transition-all ${
+                  theme === "system" ? "bg-[var(--surface-elevated)] text-white shadow-sm" : "text-[var(--text-secondary)]"
+                }`}
+              >
+                💻 Auto
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* MonAI SettingsRow: Notifications Toggle */}
+        <div className="flex items-center justify-between gap-4 p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)]">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-[var(--tag)] text-2xl flex items-center justify-center shrink-0 border border-[var(--border)]">
+              🔔
+            </div>
+            <div>
+              <h4 className="text-[17px] font-black text-[var(--text-primary)]">Renewal Alerts</h4>
+              <p className="text-xs font-bold text-[var(--text-secondary)]">In-app notifications before charges</p>
+            </div>
+          </div>
+
+          <MonaiToggle
+            checked={notificationsEnabled}
+            onChange={setNotificationsEnabled}
+          />
+        </div>
       </div>
 
       {/* Main Settings Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple space-y-6">
-        <h3 className="font-semibold text-apple-text dark:text-white text-sm pb-2 border-b border-apple-border dark:border-white/10">General Preferences</h3>
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-[var(--surface)] rounded-[32px] p-6 sm:p-8 border border-[var(--border)] shadow-2xl space-y-6">
+        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--text-secondary)] pb-2 border-b border-[var(--border-subtle)]">
+          Preferences & Budget
+        </h3>
 
         {successMsg && (
-          <div className="p-3.5 rounded-2xl bg-apple-success-soft dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs font-medium border border-emerald-200 dark:border-emerald-500/30">
+          <div className="p-4 rounded-2xl bg-[var(--green)]/15 text-[var(--green)] text-xs font-black border border-[var(--green)]/30">
             {successMsg}
           </div>
         )}
 
         {errorMsg && (
-          <div className="p-3.5 rounded-2xl bg-apple-danger-soft dark:bg-rose-500/20 text-apple-danger dark:text-rose-300 text-xs font-medium border border-rose-200 dark:border-rose-500/30">
+          <div className="p-4 rounded-2xl bg-[var(--coral)]/15 text-[var(--coral)] text-xs font-black border border-[var(--coral)]/30">
             {errorMsg}
           </div>
         )}
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Full Name</label>
-            <input
-              type="text"
-              {...register("name")}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white"
-            />
-            {errors.name && <p className="text-[10px] text-apple-danger mt-1">{errors.name.message as string}</p>}
+        {/* MonAI SettingsRow: Name */}
+        <div className="flex items-center justify-between gap-4 p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-[var(--tag)] text-2xl flex items-center justify-center shrink-0 border border-[var(--border)]">
+              👤
+            </div>
+            <div>
+              <h4 className="text-[17px] font-black text-[var(--text-primary)]">Display Name</h4>
+              <p className="text-xs font-bold text-[var(--text-secondary)]">Your account profile title</p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Base Currency Symbol</label>
-              <select
-                {...register("currency")}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white font-medium"
-              >
-                {currencies.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
+          <input
+            type="text"
+            {...register("name")}
+            className="w-full sm:w-64 px-4 py-2.5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-sm font-black text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-white/20"
+          />
+        </div>
+
+        {/* MonAI SettingsRow: Currency & Budget */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[var(--tag)] text-xl flex items-center justify-center shrink-0 border border-[var(--border)]">
+                💵
+              </div>
+              <div>
+                <h4 className="text-base font-black text-[var(--text-primary)]">Base Currency</h4>
+                <p className="text-[11px] font-bold text-[var(--text-secondary)]">Default symbol</p>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-apple-secondary dark:text-neutral-400 mb-1">Target Monthly Budget Limit</label>
-              <input
-                type="number"
-                step="0.01"
-                {...register("monthlyBudget")}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-xs focus:bg-white dark:focus:bg-[#1C1C22] focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-apple-text dark:text-white font-semibold"
-              />
+            <select
+              {...register("currency")}
+              className="w-full px-4 py-2.5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-xs font-black text-[var(--text-primary)] focus:outline-none"
+            >
+              {currencies.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[var(--tag)] text-xl flex items-center justify-center shrink-0 border border-[var(--border)]">
+                🎯
+              </div>
+              <div>
+                <h4 className="text-base font-black text-[var(--text-primary)]">Monthly Budget</h4>
+                <p className="text-[11px] font-bold text-[var(--text-secondary)]">Limit tracker</p>
+              </div>
             </div>
+
+            <input
+              type="number"
+              step="0.01"
+              {...register("monthlyBudget")}
+              className="w-full px-4 py-2.5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-xs font-black text-[var(--text-primary)] focus:outline-none"
+            />
           </div>
         </div>
 
-        <button
+        <MonaiButton
           type="submit"
+          variant="coral"
+          size="md"
           disabled={isSubmitting}
-          className="px-5 py-2.5 rounded-2xl bg-apple-text dark:bg-white text-white dark:text-black text-xs font-medium hover:opacity-90 transition shadow-sm disabled:opacity-50"
         >
-          {isSubmitting ? "Saving..." : "Save Preferences"}
-        </button>
+          {isSubmitting ? "Saving..." : "✓ Save Preferences"}
+        </MonaiButton>
       </form>
 
       {/* Data Sovereignty & Export Section */}
-      <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple space-y-4">
-        <h3 className="font-semibold text-apple-text dark:text-white text-sm pb-2 border-b border-apple-border dark:border-white/10">
-          Privacy & Data Sovereignty
+      <div className="bg-[var(--surface)] rounded-[32px] p-6 sm:p-8 border border-[var(--border)] shadow-2xl space-y-4">
+        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--text-secondary)] pb-2 border-b border-[var(--border-subtle)]">
+          Data Sovereignty & Export
         </h3>
-        <p className="text-xs text-apple-secondary dark:text-neutral-400 leading-relaxed">
-          You own your data completely. Download a raw backup copy of all your subscriptions, notifications, and settings at any time in standard JSON or CSV format.
+        <p className="text-xs font-bold text-[var(--text-secondary)] leading-relaxed">
+          Download a raw backup copy of all your subscriptions, notifications, and settings at any time.
         </p>
 
         <div className="flex flex-wrap gap-3 pt-2">
-          <button
+          <MonaiButton
             type="button"
+            variant="surface"
             onClick={handleExportJSON}
-            className="px-4 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-apple-text dark:text-white text-xs font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 transition flex items-center gap-2"
           >
-            <FileJson className="w-4 h-4 text-blue-500" />
-            Export Data as JSON
-          </button>
+            <FileJson className="w-4 h-4 text-[var(--coral)]" />
+            Export JSON
+          </MonaiButton>
 
-          <button
+          <MonaiButton
             type="button"
+            variant="surface"
             onClick={handleExportCSV}
-            className="px-4 py-2 rounded-xl bg-apple-bg dark:bg-neutral-800 border border-apple-border dark:border-white/10 text-apple-text dark:text-white text-xs font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 transition flex items-center gap-2"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            Export Data as CSV
-          </button>
+            <FileSpreadsheet className="w-4 h-4 text-[var(--green)]" />
+            Export CSV
+          </MonaiButton>
         </div>
       </div>
 
       {/* Danger Zone: Account Deletion */}
-      <div className="bg-rose-50/70 dark:bg-rose-950/30 rounded-3xl p-6 sm:p-8 border border-rose-200/60 dark:border-rose-500/20 shadow-apple space-y-4">
-        <h3 className="font-semibold text-rose-950 dark:text-rose-200 text-sm flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+      <div className="bg-[var(--coral)]/10 rounded-[32px] p-6 sm:p-8 border border-[var(--coral)]/30 shadow-2xl space-y-4">
+        <h3 className="font-black text-[var(--coral)] text-base flex items-center gap-2">
+          <ShieldAlert className="w-5 h-5 stroke-[2.5]" />
           Danger Zone
         </h3>
-        <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
-          Permanently delete your account, saved preferences, and all subscription tracking records from our database.
+        <p className="text-xs font-bold text-[var(--text-secondary)] leading-relaxed">
+          Permanently delete your account, saved preferences, and all subscription tracking records.
         </p>
 
-        <button
+        <MonaiButton
           type="button"
+          variant="coral"
           onClick={handleDeleteAccount}
-          className="px-5 py-2.5 rounded-2xl bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 transition shadow-sm flex items-center gap-2"
         >
           <Trash2 className="w-4 h-4" />
           Delete Account & Purge Data
-        </button>
+        </MonaiButton>
       </div>
     </div>
   );

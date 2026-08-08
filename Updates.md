@@ -198,6 +198,18 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
   - **Historial Verificado**: Lista de cancelaciones confirmadas con acción `Reactivate`.
 - **Cómo verificar**: Navegar a `/cancellation` y verificar los botones de acción rápida de cancelación.
 
+---
+
+## [Rediseño MonAI - F8] - 2026-08-08 (Settings View & Navegación MonAI) - COMPLETADO ✅
+
+- **Fase**: F8 - Settings View & Navegación MonAI (`/settings`)
+- **Archivos cambiados**: `src/app/settings/SettingsView.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se rediseñó la vista de Configuración al sistema `SettingsRow` de MonAI:
+  - **SettingsRow**: Íconos circulares de 56px (`emoji` 26px sobre `--tag`), títulos `17px w800`, subtítulos y controles `MonaiToggle` (iOS Switch verde) o segmented pills.
+  - **Preservación total**: Formularios Zod + React Hook Form intactos, exportación JSON/CSV y borrado definitivo de cuenta.
+- **Cómo verificar**: Navegar a `/settings` y probar el toggle de tema, moneda y presupuesto.
+
+
 
 
 
