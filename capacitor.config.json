@@ -5,11 +5,16 @@
   "bundledWebRuntime": false,
   "server": {
     "url": "https://subs-manager-mofn23s-projects.vercel.app",
-    "cleartext": true
+    "cleartext": true,
+    "allowNavigation": [
+      "subs-manager-mofn23s-projects.vercel.app",
+      "*.vercel.app"
+    ]
   },
   "ios": {
     "contentInset": "always",
     "allowsLinkPreview": false,
-    "scrollEnabled": true
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": false
   }
 }
