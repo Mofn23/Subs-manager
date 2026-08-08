@@ -174,6 +174,19 @@ Lanzamiento inicial de **Subs Manager**, la aplicación de gestión de suscripci
   - **ListGroups por fecha**: Agrupación por mes con pills de totales por grupo, cajas de fecha MonAI (`dd` prominente `w900`), `MonaiAvatar` emoji y `MonaiAmountPill` a la derecha.
 - **Cómo verificar**: Navegar a `/timeline` en la app y probar los diferentes horizontes (7d, 30d, 90d, 1y).
 
+---
+
+## [Rediseño MonAI - F6] - 2026-08-08 (Insights View MonAI) - COMPLETADO ✅
+
+- **Fase**: F6 - Insights View MonAI (`/insights`)
+- **Archivos cambiados**: `src/app/insights/InsightsView.tsx`, `Updates.md`
+- **Decisiones de diseño**: Se rediseñó la vista de Inteligencia Financiera:
+  - **Detector de Fugas (`ListGroup`)**: Filas con avatar emoji `👻` MonAI, títulos `w800`, tag coral "Review / Low Usage", `MonaiAmountPill` coral y botón "Cancel & Save".
+  - **Top 5 Suscripciones más costosas**: Tarjetas `MonaiAvatar` y montos destacados.
+  - **Distribución de gasto por categoría**: Barras de progreso con acento verde pastel `MonAI`.
+- **Cómo verificar**: Navegar a `/insights` en la app y verificar la detección de suscripciones marcadas como poco usadas.
+
+
 
 
 

@@ -1,7 +1,11 @@
 "use client";
 
-import { calculateMonthlyEquivalent, detectSubscriptionLeaks, formatCurrency } from "@/lib/financials";
-import { AlertCircle, ArrowDownRight, PieChart, ShieldAlert, Sparkles, TrendingDown } from "lucide-react";
+import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
+import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
+import { MonaiButton } from "@/components/ui/MonaiButton";
+import { MonaiPill } from "@/components/ui/MonaiPill";
+import { calculateMonthlyEquivalent, detectSubscriptionLeaks, formatCurrency, getAutoEmoji } from "@/lib/financials";
+import { PieChart, Sparkles, TrendingDown } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -57,78 +61,85 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
   }, [activeSubs, totalMonthlySpend]);
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Header Card */}
-      <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 sm:p-8 border border-apple-border dark:border-white/10 shadow-apple">
-        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-apple-secondary dark:text-neutral-400 mb-1">
-          <PieChart className="w-3.5 h-3.5 text-apple-tertiary dark:text-neutral-500" />
+    <div className="space-y-8 max-w-4xl mx-auto pb-24">
+      {/* Header MonAI Card */}
+      <div className="bg-[var(--surface)] rounded-[32px] p-8 border border-[var(--border)] shadow-2xl">
+        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] mb-2">
+          <PieChart className="w-4 h-4 text-[var(--coral)] stroke-[2.5]" />
           Financial Intelligence
         </div>
-        <h1 className="text-2xl font-semibold text-apple-text dark:text-white tracking-tight">Subscription Insights</h1>
-        <p className="text-xs text-apple-secondary dark:text-neutral-400 mt-0.5">
+        <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Subscription Insights</h1>
+        <p className="text-xs font-bold text-[var(--text-secondary)] mt-1">
           Deep visibility into expense distribution, top costs, and potential monthly savings.
         </p>
       </div>
 
-      {/* Optimization & Leak Detection Highlight Card */}
-      <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/60 dark:from-blue-950/30 dark:to-indigo-950/20 rounded-3xl p-6 border border-blue-100/80 dark:border-blue-500/20 shadow-apple space-y-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-sm">
-              <TrendingDown className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-apple-text dark:text-white text-base">Subscription Leak Detector</h3>
-              <p className="text-xs text-apple-secondary dark:text-neutral-400">
-                Identify underutilized or trial subscriptions draining your budget.
-              </p>
-            </div>
-          </div>
+      {/* MonAI Subscription Leak Detector ListGroup */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-2">
+          <MonaiPill variant="coral" className="text-xs font-black">
+            👻 Money Leaks Detected ({leaks.lowUsageSubs.length + leaks.expiringTrials.length})
+          </MonaiPill>
 
-          <div className="text-right">
-            <div className="text-xs font-medium text-apple-secondary dark:text-neutral-400">Potential Monthly Savings</div>
-            <div className="text-xl font-bold text-apple-accent dark:text-blue-400">
-              {formatCurrency(leaks.potentialMonthlySavings, currency)}/mo
-            </div>
-            <div className="text-[10px] text-apple-tertiary dark:text-neutral-400 font-medium">
-              ({formatCurrency(leaks.potentialAnnualSavings, currency)}/yr)
-            </div>
-          </div>
+          <MonaiPill variant="tag" className="text-xs font-bold">
+            Potential Savings: {formatCurrency(leaks.potentialMonthlySavings, currency)}/mo
+          </MonaiPill>
         </div>
 
         {leaks.lowUsageSubs.length === 0 && leaks.expiringTrials.length === 0 ? (
-          <div className="p-4 rounded-2xl bg-white/80 dark:bg-[#16161A]/80 border border-blue-100 dark:border-blue-500/20 text-xs text-apple-secondary dark:text-neutral-300 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
-            Your portfolio is optimized! No low-usage subscriptions or expiring trials detected.
+          <div className="p-8 rounded-[32px] bg-[var(--surface)] border border-[var(--border)] text-center space-y-3">
+            <div className="w-14 h-14 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center text-3xl mx-auto">
+              ✨
+            </div>
+            <h3 className="font-black text-[var(--text-primary)] text-base">Your portfolio is optimized!</h3>
+            <p className="text-xs font-bold text-[var(--text-secondary)] max-w-sm mx-auto">
+              No low-usage subscriptions or expiring trials detected draining your budget.
+            </p>
           </div>
         ) : (
-          <div className="space-y-2 pt-2">
-            {leaks.lowUsageSubs.map((sub) => (
-              <div
-                key={sub.id}
-                className="p-3.5 rounded-2xl bg-white dark:bg-[#16161A] border border-blue-100 dark:border-blue-500/20 flex items-center justify-between gap-4 text-xs"
-              >
-                <div>
-                  <span className="font-semibold text-apple-text dark:text-white">{sub.name}</span>
-                  <span className="text-apple-secondary dark:text-neutral-400 ml-2">Flagged as low usage</span>
+          <div className="space-y-3">
+            {leaks.lowUsageSubs.map((sub) => {
+              const monthlyCost = calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths);
+              const icon = sub.icon || getAutoEmoji(sub.name, sub.category);
+
+              return (
+                <div
+                  key={sub.id}
+                  className="bg-[var(--surface)] rounded-[28px] p-5 border border-[var(--coral)]/40 shadow-xl flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <MonaiAvatar emoji="👻" size="md" isRecurring={true} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate">
+                          {sub.name}
+                        </h4>
+                        <MonaiPill variant="coral" className="text-[11px] py-0.5 px-2">
+                          Review / Low Usage
+                        </MonaiPill>
+                      </div>
+                      <p className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 truncate">
+                        {sub.provider} • Underutilized expense
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <MonaiAmountPill
+                      amount={`${formatCurrency(monthlyCost, currency)}/mo`}
+                      prefix="⊖"
+                      isPositive={false}
+                    />
+
+                    <Link href="/cancellation">
+                      <MonaiButton variant="coral" size="sm">
+                        Cancel & Save
+                      </MonaiButton>
+                    </Link>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-apple-text dark:text-white">
-                    {formatCurrency(
-                      calculateMonthlyEquivalent(sub.price, sub.billingCycle, sub.customIntervalMonths),
-                      currency
-                    )}
-                    /mo
-                  </span>
-                  <Link
-                    href="/cancellation"
-                    className="px-3 py-1 rounded-xl bg-apple-accent-soft dark:bg-blue-500/20 text-apple-accent dark:text-blue-400 text-[11px] font-medium hover:bg-blue-100 dark:hover:bg-blue-500/30 transition"
-                  >
-                    Cancel & Save
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -136,53 +147,61 @@ export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
       {/* Grid: Top 5 Expensive + Category Spend */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Top 5 Most Expensive */}
-        <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 border border-apple-border dark:border-white/10 shadow-apple space-y-4">
-          <h3 className="font-semibold text-apple-text dark:text-white text-sm">Top 5 Most Expensive</h3>
+        <div className="bg-[var(--surface)] rounded-[32px] p-6 sm:p-8 border border-[var(--border)] shadow-2xl space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="font-black text-[var(--text-primary)] text-base">Top 5 Expensive</h3>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">Highest monthly cost</span>
+          </div>
 
           <div className="space-y-3">
-            {top5Subscriptions.map((sub, idx) => (
-              <div key={sub.id} className="flex items-center justify-between text-xs pb-2.5 border-b border-apple-border dark:border-white/10 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                  <span className="w-5 h-5 rounded-full bg-apple-bg dark:bg-neutral-800 flex items-center justify-center font-bold text-[10px] text-apple-tertiary dark:text-neutral-400">
-                    {idx + 1}
-                  </span>
-                  <div>
-                    <div className="font-semibold text-apple-text dark:text-white">{sub.name}</div>
-                    <div className="text-[11px] text-apple-tertiary dark:text-neutral-400">{sub.category}</div>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className="font-semibold text-apple-text dark:text-white">
-                    {formatCurrency(sub.monthlyPrice, currency)}/mo
-                  </div>
-                  {sub.billingCycle !== "MONTHLY" && (
-                    <div className="text-[10px] text-apple-tertiary dark:text-neutral-400">
-                      {formatCurrency(sub.price, currency)} ({sub.billingCycle.toLowerCase()})
+            {top5Subscriptions.map((sub, idx) => {
+              const icon = sub.icon || getAutoEmoji(sub.name, sub.category);
+              return (
+                <div
+                  key={sub.id}
+                  className="flex items-center justify-between p-3.5 rounded-[20px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)]"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="w-6 h-6 rounded-full bg-[var(--tag)] text-[var(--text-primary)] font-black text-xs flex items-center justify-center shrink-0">
+                      {idx + 1}
+                    </span>
+                    <MonaiAvatar emoji={icon} size="sm" isRecurring={false} />
+                    <div className="min-w-0">
+                      <div className="font-black text-sm text-[var(--text-primary)] truncate">{sub.name}</div>
+                      <div className="text-[11px] font-bold text-[var(--text-secondary)] truncate">{sub.category}</div>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <div className="text-sm font-black text-[var(--text-primary)]">
+                      {formatCurrency(sub.monthlyPrice, currency)}/mo
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Category Spend Distribution */}
-        <div className="bg-white dark:bg-[#16161A] rounded-3xl p-6 border border-apple-border dark:border-white/10 shadow-apple space-y-4">
-          <h3 className="font-semibold text-apple-text dark:text-white text-sm">Spend by Category</h3>
+        {/* Category Spend Breakdown */}
+        <div className="bg-[var(--surface)] rounded-[32px] p-6 sm:p-8 border border-[var(--border)] shadow-2xl space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="font-black text-[var(--text-primary)] text-base">Spend by Category</h3>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">Share of total</span>
+          </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {categoryBreakdown.map((cat) => (
-              <div key={cat.category} className="space-y-1">
-                <div className="flex items-center justify-between text-xs font-medium">
-                  <span className="text-apple-text dark:text-white">{cat.category}</span>
-                  <span className="text-apple-secondary dark:text-neutral-400">
+              <div key={cat.category} className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-black">
+                  <span className="text-[var(--text-primary)]">{cat.category}</span>
+                  <span className="text-[var(--text-secondary)]">
                     {formatCurrency(cat.amount, currency)}/mo ({Math.round(cat.percentage)}%)
                   </span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-apple-bg dark:bg-neutral-800 overflow-hidden border border-apple-border dark:border-white/10">
+                <div className="w-full h-3 rounded-full bg-[var(--surface-elevated)] overflow-hidden p-0.5 border border-[var(--border-subtle)]">
                   <div
-                    className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                    className="h-full bg-[var(--green)] rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(cat.percentage, 100)}%` }}
                   />
                 </div>
