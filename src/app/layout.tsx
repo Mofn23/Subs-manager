@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen flex flex-col bg-apple-bg text-apple-text antialiased selection:bg-blue-100 selection:text-blue-900 touch-manipulation">
         <Providers>
           <Navbar notifications={notifications} />
-          <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+          <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-4 pb-12">
             {children}
           </main>
           <footer className="border-t border-apple-border py-6 text-center text-xs text-apple-tertiary">
