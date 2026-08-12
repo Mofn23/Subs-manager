@@ -5,6 +5,7 @@ import { MonaiButton } from "@/components/ui/MonaiButton";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { MonaiSheet } from "@/components/ui/MonaiSheet";
 import { getAutoEmoji, SubscriptionItem } from "@/lib/financials";
+import { markLocalSubscriptionAsPaid, saveLocalSubscription } from "@/lib/storage";
 import { subscriptionSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -33,14 +34,6 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
   const [selectedIcon, setSelectedIcon] = useState("🍿");
   const [hasCustomIcon, setHasCustomIcon] = useState(false);
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
-
-  const handleQuickMarkPaid = async () => {
-    if (!subscriptionToEdit) return;
-    setIsMarkingPaid(true);
-    await markSubscriptionAsPaid(subscriptionToEdit.id);
-    setIsMarkingPaid(false);
-    onClose();
-  };
 
   const categories = [
     { name: "Streaming", emoji: "🍿" },
@@ -133,24 +126,25 @@ export function SubscriptionModal({ isOpen, onClose, subscriptionToEdit, currenc
     }
   }, [watchName, watchCategory, hasCustomIcon, subscriptionToEdit, setValue]);
 
-  const router = useRouter();
+  const handleQuickMarkPaid = async () => {
+    if (!subscriptionToEdit) return;
+    setIsMarkingPaid(true);
+    markLocalSubscriptionAsPaid(subscriptionToEdit.id);
+    setIsMarkingPaid(false);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("storage_updated"));
+    onClose();
+  };
 
   const onSubmit = async (data: any) => {
     setErrorMsg("");
     try {
-      let res;
-      if (subscriptionToEdit) {
-        res = await updateSubscription(subscriptionToEdit.id, data);
-      } else {
-        res = await createSubscription(data);
-      }
-
-      if (res?.error) {
-        setErrorMsg(res.error);
-      } else {
-        router.refresh();
-        onClose();
-      }
+      const payload = {
+        ...data,
+        id: subscriptionToEdit ? subscriptionToEdit.id : undefined,
+      };
+      saveLocalSubscription(payload);
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("storage_updated"));
+      onClose();
     } catch (err: any) {
       setErrorMsg(err?.message || "An unexpected error occurred.");
     }

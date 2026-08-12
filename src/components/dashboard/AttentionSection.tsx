@@ -1,8 +1,8 @@
 "use client";
 
-import { markSubscriptionAsPaid } from "@/app/actions/subscriptions";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
+import { markLocalSubscriptionAsPaid } from "@/lib/storage";
 import { CheckCircle2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
@@ -17,8 +17,9 @@ export function AttentionSection({ subscriptions, currency }: AttentionSectionPr
 
   const handleMarkPaid = async (id: string) => {
     setLoadingId(id);
-    await markSubscriptionAsPaid(id);
+    markLocalSubscriptionAsPaid(id);
     setLoadingId(null);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("storage_updated"));
   };
 
   // Filter trials & upcoming renewals within 7 days

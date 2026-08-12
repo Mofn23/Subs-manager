@@ -5,6 +5,7 @@ import { MonaiButton } from "@/components/ui/MonaiButton";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { MonaiToggle } from "@/components/ui/MonaiToggle";
 import { requestNotificationPermissions, sendTestNotification } from "@/lib/notifications";
+import { getLocalUserPrefs, saveLocalUserPrefs } from "@/lib/storage";
 import { userSettingsSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BellRing, FileJson, FileSpreadsheet, Laptop, Moon, Settings, ShieldAlert, Sun, Trash2 } from "lucide-react";
@@ -62,13 +63,12 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
   const onSubmit = async (data: any) => {
     setSuccessMsg("");
     setErrorMsg("");
-    const res = await updateUserSettings(data);
-    if (res?.error) {
-      setErrorMsg(res.error);
-    } else {
-      await update({ currency: data.currency, monthlyBudget: data.monthlyBudget });
-      setSuccessMsg("Preferences updated successfully.");
-    }
+    saveLocalUserPrefs({
+      name: data.name,
+      currency: data.currency,
+      monthlyBudget: parseFloat(data.monthlyBudget),
+    });
+    setSuccessMsg("Preferencias guardadas localmente en tu iPhone.");
   };
 
   const handleExportJSON = async () => {

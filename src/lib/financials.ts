@@ -20,6 +20,9 @@ export interface SubscriptionItem {
   cancelUrl?: string | null;
   cancelSteps?: string | null;
   reminderDays?: number;
+  userId?: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 /**

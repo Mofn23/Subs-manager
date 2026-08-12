@@ -1,10 +1,10 @@
 "use client";
 
-import { markSubscriptionAsPaid, toggleLowUsageFlag, updateSubscriptionStatus } from "@/app/actions/subscriptions";
 import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiDropdown, MonaiDropdownItem } from "@/components/ui/MonaiDropdown";
 import { calculateMonthlyEquivalent, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
+import { markLocalSubscriptionAsPaid, toggleLocalLowUsage, updateLocalSubscriptionStatus } from "@/lib/storage";
 import { CheckCircle2, Edit2, Flag, MoreVertical, ShieldAlert, Trash2 } from "lucide-react";
 import { useState } from "react";
 
@@ -31,19 +31,22 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
   const handleMarkAsPaid = async () => {
     setShowMenu(false);
     setIsPaidLoading(true);
-    await markSubscriptionAsPaid(subscription.id);
+    markLocalSubscriptionAsPaid(subscription.id);
     setIsPaidLoading(false);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("storage_updated"));
   };
 
   const handleToggleFlag = async () => {
     const nextState = !flagged;
     setFlagged(nextState);
-    await toggleLowUsageFlag(subscription.id, nextState);
+    toggleLocalLowUsage(subscription.id, nextState);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("storage_updated"));
   };
 
   const handleMarkToCancel = async () => {
     setShowMenu(false);
-    await updateSubscriptionStatus(subscription.id, "TO_CANCEL");
+    updateLocalSubscriptionStatus(subscription.id, "TO_CANCEL");
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("storage_updated"));
   };
 
   const icon = subscription.icon || getAutoEmoji(subscription.name, subscription.category);

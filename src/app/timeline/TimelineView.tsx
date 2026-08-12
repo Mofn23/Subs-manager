@@ -4,16 +4,24 @@ import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { formatCurrency, getAutoEmoji, getDaysUntil } from "@/lib/financials";
+import { getLocalSubscriptions, getLocalUserPrefs } from "@/lib/storage";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, ExternalLink } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type TimeRange = "7d" | "30d" | "90d" | "1y";
 
-export function TimelineView({ subscriptions }: { subscriptions: any[] }) {
-  const { data: session } = useSession();
-  const currency = session?.user?.currency || "$";
+export function TimelineView({ subscriptions: initialSubs = [] }: { subscriptions?: any[] }) {
+  const [subsList, setSubsList] = useState(initialSubs);
+  const [userPrefs, setUserPrefs] = useState({ currency: "COP" });
+
+  useEffect(() => {
+    setSubsList(getLocalSubscriptions());
+    setUserPrefs(getLocalUserPrefs());
+  }, []);
+
+  const currency = userPrefs.currency || "COP";
+  const subscriptions = subsList.length > 0 ? subsList : initialSubs;
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
 
   const referenceDate = new Date();

@@ -4,14 +4,22 @@ import { MonaiAmountPill } from "@/components/ui/MonaiAmountPill";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiButton } from "@/components/ui/MonaiButton";
 import { calculateMonthlyEquivalent, detectSubscriptionLeaks, formatCurrency, getAutoEmoji } from "@/lib/financials";
+import { getLocalSubscriptions, getLocalUserPrefs } from "@/lib/storage";
 import { PieChart } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-export function InsightsView({ subscriptions }: { subscriptions: any[] }) {
-  const { data: session } = useSession();
-  const currency = session?.user?.currency || "$";
+export function InsightsView({ subscriptions: initialSubs = [] }: { subscriptions?: any[] }) {
+  const [subsList, setSubsList] = useState(initialSubs);
+  const [userPrefs, setUserPrefs] = useState({ currency: "COP" });
+
+  useEffect(() => {
+    setSubsList(getLocalSubscriptions());
+    setUserPrefs(getLocalUserPrefs());
+  }, []);
+
+  const currency = userPrefs.currency || "COP";
+  const subscriptions = subsList.length > 0 ? subsList : initialSubs;
 
   const activeSubs = useMemo(() => {
     return subscriptions.filter(

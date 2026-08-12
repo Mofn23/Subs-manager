@@ -1,7 +1,5 @@
-import { LoginView } from "./LoginView";
-
-export const dynamic = "force-dynamic";
+import { DashboardView } from "../DashboardView";
 
 export default function LoginPage() {
-  return <LoginView />;
+  return <DashboardView />;
 }

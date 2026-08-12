@@ -11,35 +11,39 @@ import { MonaiFAB } from "@/components/ui/MonaiFAB";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, calculateSpendSummary, detectSubscriptionLeaks, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
 import { scheduleSubscriptionNotifications } from "@/lib/notifications";
+import { deleteLocalSubscription, getLocalSubscriptions, getLocalUserPrefs, saveLocalSubscription } from "@/lib/storage";
 import { Plus, Search } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 interface DashboardViewProps {
-  initialSubscriptions: any[];
+  initialSubscriptions?: any[];
 }
 
-export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
-  const { data: session } = useSession();
+export function DashboardView({ initialSubscriptions = [] }: DashboardViewProps) {
+  const [subsList, setSubsList] = useState<SubscriptionItem[]>([]);
+  const [userPrefs, setUserPrefs] = useState({ currency: "COP", monthlyBudget: 350000, onboarded: true });
   const [filter, setFilter] = useState<FilterStatus>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSub, setEditingSub] = useState<SubscriptionItem | null>(null);
 
-  const currency = session?.user?.currency || "$";
-  const monthlyBudget = session?.user?.monthlyBudget;
-  const showOnboarding = session?.user && !session.user.onboarded;
+  useEffect(() => {
+    setSubsList(getLocalSubscriptions());
+    setUserPrefs(getLocalUserPrefs());
+  }, []);
 
-  // Process subscriptions
-  const subscriptions: SubscriptionItem[] = useMemo(() => {
-    return initialSubscriptions.map((s) => ({
-      ...s,
-      nextRenewalDate: s.nextRenewalDate ? new Date(s.nextRenewalDate) : new Date(),
-      trialEndDate: s.trialEndDate ? new Date(s.trialEndDate) : null,
-    }));
-  }, [initialSubscriptions]);
+  const refreshSubs = () => {
+    setSubsList(getLocalSubscriptions());
+    setUserPrefs(getLocalUserPrefs());
+  };
+
+  const currency = userPrefs.currency || "COP";
+  const monthlyBudget = userPrefs.monthlyBudget;
+  const showOnboarding = false;
+
+  const subscriptions = subsList;
 
   // Schedule native iOS notifications (3 days, 1 day, 0 days)
   useEffect(() => {
@@ -159,11 +163,10 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
     return groups;
   }, [filteredSubscriptions]);
 
-  const router = useRouter();
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this subscription?")) {
-      await deleteSubscription(id);
-      router.refresh();
+    if (confirm("¿Estás seguro de eliminar esta suscripción?")) {
+      deleteLocalSubscription(id);
+      refreshSubs();
     }
   };
 

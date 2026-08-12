@@ -1,16 +1,32 @@
 "use client";
 
-import { updateSubscriptionStatus } from "@/app/actions/subscriptions";
 import { MonaiAvatar } from "@/components/ui/MonaiAvatar";
 import { MonaiButton } from "@/components/ui/MonaiButton";
 import { calculateMonthlyEquivalent, formatCurrency } from "@/lib/financials";
+import { getLocalSubscriptions, getLocalUserPrefs, updateLocalSubscriptionStatus } from "@/lib/storage";
 import { CheckCircle2, ExternalLink, ShieldAlert, Undo2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
-  const { data: session } = useSession();
-  const currency = session?.user?.currency || "$";
+export function CancellationView({ subscriptions: initialSubs = [] }: { subscriptions?: any[] }) {
+  const [subsList, setSubsList] = useState(initialSubs);
+  const [userPrefs, setUserPrefs] = useState({ currency: "COP" });
+
+  useEffect(() => {
+    setSubsList(getLocalSubscriptions());
+    setUserPrefs(getLocalUserPrefs());
+  }, []);
+
+  const refreshSubs = () => {
+    setSubsList(getLocalSubscriptions());
+  };
+
+  const currency = userPrefs.currency || "COP";
+  const subscriptions = subsList.length > 0 ? subsList : initialSubs;
+
+  const handleUpdateStatus = (id: string, status: string) => {
+    updateLocalSubscriptionStatus(id, status);
+    refreshSubs();
+  };
 
   // Filter subscriptions in cancellation lifecycle
   const toCancelSubs = useMemo(() => {
@@ -31,11 +47,13 @@ export function CancellationView({ subscriptions }: { subscriptions: any[] }) {
   }, [cancelledSubs]);
 
   const handleVerifyCancel = async (id: string) => {
-    await updateSubscriptionStatus(id, "VERIFIED_CANCELLED");
+    updateLocalSubscriptionStatus(id, "VERIFIED_CANCELLED");
+    refreshSubs();
   };
 
   const handleReactivate = async (id: string) => {
-    await updateSubscriptionStatus(id, "ACTIVE");
+    updateLocalSubscriptionStatus(id, "ACTIVE");
+    refreshSubs();
   };
 
   return (
