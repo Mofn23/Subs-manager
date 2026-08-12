@@ -11,14 +11,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = CAPBridgeViewController()
         window?.makeKeyAndVisible()
 
-        SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
+        if let userActivity = connectionOptions.userActivities.first {
+            ApplicationDelegateProxy.shared.continue(userActivity)
+        }
+        if let url = connectionOptions.urlContexts.first?.url {
+            ApplicationDelegateProxy.shared.open(url, options: [:])
+        }
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
+        if let url = URLContexts.first?.url {
+            ApplicationDelegateProxy.shared.open(url, options: [:])
+        }
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        SceneDelegateProxy.shared.scene(scene, continue: userActivity)
+        ApplicationDelegateProxy.shared.continue(userActivity)
     }
 }
