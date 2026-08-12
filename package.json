@@ -12,9 +12,9 @@
     "test": "node src/lib/financials.test.js"
   },
   "dependencies": {
-    "@capacitor/core": "^8.5.0",
-    "@capacitor/ios": "^8.5.0",
-    "@capacitor/local-notifications": "^8.2.1",
+    "@capacitor/core": "^7.6.8",
+    "@capacitor/ios": "^7.6.8",
+    "@capacitor/local-notifications": "^7.0.7",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^5.18.0",
     "bcryptjs": "^2.4.3",
@@ -31,7 +31,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.0",
+    "@capacitor/cli": "^7.6.8",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.14.14",
     "@types/react": "^18.3.3",
