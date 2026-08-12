@@ -17,6 +17,16 @@ export interface UserPrefs {
   theme: "dark" | "light" | "system";
 }
 
+export interface LocalNotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  link?: string | null;
+  createdAt: string;
+}
+
 const DEFAULT_USER_PREFS: UserPrefs = {
   name: "Usuario",
   email: "usuario@subsmanager.app",
@@ -139,9 +149,14 @@ const INITIAL_SEED_SUBSCRIPTIONS: SubscriptionItem[] = [
   },
 ];
 
-// Helper to check if window is available
 function isBrowser(): boolean {
   return typeof window !== "undefined";
+}
+
+function notifyStorageUpdated(): void {
+  if (isBrowser()) {
+    window.dispatchEvent(new Event("storage_updated"));
+  }
 }
 
 // User Prefs
@@ -164,7 +179,52 @@ export function saveLocalUserPrefs(prefs: Partial<UserPrefs>): UserPrefs {
   const current = getLocalUserPrefs();
   const updated = { ...current, ...prefs };
   localStorage.setItem(STORAGE_KEYS.USER_PREFS, JSON.stringify(updated));
+  notifyStorageUpdated();
   return updated;
+}
+
+// Notifications Storage
+export function getLocalNotifications(): LocalNotificationItem[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch (e) {
+    return [];
+  }
+}
+
+export function addLocalNotification(notif: { title: string; message: string; type?: string }): LocalNotificationItem[] {
+  if (!isBrowser()) return [];
+  const current = getLocalNotifications();
+  const newItem: LocalNotificationItem = {
+    id: `notif_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+    title: notif.title,
+    message: notif.message,
+    type: notif.type || "INFO",
+    read: false,
+    createdAt: new Date().toISOString(),
+  };
+  const updated = [newItem, ...current].slice(0, 40);
+  localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(updated));
+  notifyStorageUpdated();
+  return updated;
+}
+
+export function markLocalNotificationAsRead(id: string): LocalNotificationItem[] {
+  if (!isBrowser()) return [];
+  const current = getLocalNotifications();
+  const updated = current.map((n) => (n.id === id ? { ...n, read: true } : n));
+  localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(updated));
+  notifyStorageUpdated();
+  return updated;
+}
+
+export function clearAllLocalNotifications(): void {
+  if (!isBrowser()) return;
+  localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]));
+  notifyStorageUpdated();
 }
 
 // Subscriptions
@@ -226,6 +286,7 @@ export function saveLocalSubscription(data: any): SubscriptionItem {
 
   if (isBrowser()) {
     localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(updatedList));
+    notifyStorageUpdated();
   }
   return newItem;
 }
@@ -235,6 +296,7 @@ export function deleteLocalSubscription(id: string): void {
   const current = getLocalSubscriptions();
   const updatedList = current.filter((item) => item.id !== id);
   localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(updatedList));
+  notifyStorageUpdated();
 }
 
 export function toggleLocalLowUsage(id: string, flagged: boolean): SubscriptionItem[] {
@@ -244,6 +306,7 @@ export function toggleLocalLowUsage(id: string, flagged: boolean): SubscriptionI
     item.id === id ? { ...item, flaggedLowUsage: flagged, updatedAt: new Date() } : item
   );
   localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(updatedList));
+  notifyStorageUpdated();
   return updatedList;
 }
 
@@ -254,6 +317,7 @@ export function updateLocalSubscriptionStatus(id: string, status: string): Subsc
     item.id === id ? { ...item, status: status as any, updatedAt: new Date() } : item
   );
   localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(updatedList));
+  notifyStorageUpdated();
   return updatedList;
 }
 
@@ -264,7 +328,7 @@ export function markLocalSubscriptionAsPaid(id: string): SubscriptionItem[] {
   if (!item) return current;
 
   const currentDate = new Date();
-  const baseDate = item.nextRenewalDate < currentDate ? currentDate : new Date(item.nextRenewalDate);
+  const baseDate = new Date(item.nextRenewalDate) < currentDate ? currentDate : new Date(item.nextRenewalDate);
   const nextDate = new Date(baseDate);
 
   switch (item.billingCycle) {
@@ -295,9 +359,17 @@ export function markLocalSubscriptionAsPaid(id: string): SubscriptionItem[] {
   }
 
   const updatedList = current.map((s) =>
-    s.id === id ? { ...s, nextRenewalDate: nextDate, updatedAt: new Date() } : s
+    s.id === id ? { ...s, nextRenewalDate: nextDate, status: "ACTIVE" as const, updatedAt: new Date() } : s
   );
 
   localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(updatedList));
+
+  addLocalNotification({
+    title: "Pago Registrado 💳",
+    message: `Suscripción "${item.name}" marcada como pagada. Próxima renovación: ${nextDate.toLocaleDateString()}`,
+    type: "SUCCESS",
+  });
+
+  notifyStorageUpdated();
   return updatedList;
 }

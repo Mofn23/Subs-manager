@@ -5,7 +5,7 @@ import { MonaiButton } from "@/components/ui/MonaiButton";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { MonaiToggle } from "@/components/ui/MonaiToggle";
 import { requestNotificationPermissions, sendTestNotification } from "@/lib/notifications";
-import { getLocalUserPrefs, saveLocalUserPrefs } from "@/lib/storage";
+import { getLocalSubscriptions, getLocalUserPrefs, saveLocalUserPrefs } from "@/lib/storage";
 import { userSettingsSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BellRing, FileJson, FileSpreadsheet, Laptop, Moon, Settings, ShieldAlert, Sun, Trash2 } from "lucide-react";
@@ -72,53 +72,54 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
   };
 
   const handleExportJSON = async () => {
-    const res = await exportUserData();
-    if (res.success && res.data) {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(res.data, null, 2));
-      const downloadAnchor = document.createElement("a");
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `subs-manager-export-${new Date().toISOString().split("T")[0]}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
+    const data = {
+      prefs: getLocalUserPrefs(),
+      subscriptions: getLocalSubscriptions(),
+      exportedAt: new Date().toISOString(),
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `subs-manager-export-${new Date().toISOString().split("T")[0]}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
   };
 
   const handleExportCSV = async () => {
-    const res = await exportUserData();
-    if (res.success && res.data?.subscriptions) {
-      const subs = res.data.subscriptions;
-      if (subs.length === 0) {
-        alert("No subscriptions to export.");
-        return;
-      }
-
-      const headers = ["ID", "Name", "Provider", "Category", "Price", "BillingCycle", "NextRenewalDate", "Status"];
-      const rows = subs.map((s: any) => [
-        s.id,
-        `"${s.name}"`,
-        `"${s.provider}"`,
-        `"${s.category}"`,
-        s.price,
-        s.billingCycle,
-        s.nextRenewalDate,
-        s.status,
-      ]);
-
-      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-      const downloadAnchor = document.createElement("a");
-      downloadAnchor.setAttribute("href", encodeURI(csvContent));
-      downloadAnchor.setAttribute("download", `subs-manager-export-${new Date().toISOString().split("T")[0]}.csv`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+    const subs = getLocalSubscriptions();
+    if (subs.length === 0) {
+      alert("No hay suscripciones para exportar.");
+      return;
     }
+
+    const headers = ["ID", "Name", "Provider", "Category", "Price", "BillingCycle", "NextRenewalDate", "Status"];
+    const rows = subs.map((s: any) => [
+      s.id,
+      `"${s.name}"`,
+      `"${s.provider}"`,
+      `"${s.category}"`,
+      s.price,
+      s.billingCycle,
+      typeof s.nextRenewalDate === "string" ? s.nextRenewalDate : s.nextRenewalDate.toISOString(),
+      s.status,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", encodeURI(csvContent));
+    downloadAnchor.setAttribute("download", `subs-manager-export-${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
   };
 
   const handleDeleteAccount = async () => {
-    if (confirm("CRITICAL WARNING: Are you sure you want to delete your account permanently? This action CANNOT be undone.")) {
-      await deleteAccount();
-      signOut({ callbackUrl: "/login" });
+    if (confirm("ADVERTENCIA: ¿Estás seguro de borrar todos tus datos locales? Esta acción no se puede deshacer.")) {
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+        window.location.reload();
+      }
     }
   };
 

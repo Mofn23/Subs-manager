@@ -28,7 +28,8 @@ export function SubscriptionCard({ subscription, currency, onEdit, onDelete }: S
 
   const daysUntilRenewal = getDaysUntil(subscription.nextRenewalDate);
 
-  const handleMarkAsPaid = async () => {
+  const handleMarkAsPaid = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setShowMenu(false);
     setIsPaidLoading(true);
     markLocalSubscriptionAsPaid(subscription.id);

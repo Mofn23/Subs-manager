@@ -84,8 +84,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.0.3-offline-ipa
-          name: Subs Manager 100% Standalone Offline Native iOS IPA (v2.0.3)
+          tag_name: v2.0.4-offline-ipa
+          name: Subs Manager 100% Standalone Offline Native iOS IPA (v2.0.4)
           body: |
             ## 📱 Subs Manager 100% Standalone Offline Native iOS IPA Package
             

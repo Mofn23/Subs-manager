@@ -14,8 +14,17 @@ export function InsightsView({ subscriptions: initialSubs = [] }: { subscription
   const [userPrefs, setUserPrefs] = useState({ currency: "COP" });
 
   useEffect(() => {
-    setSubsList(getLocalSubscriptions());
-    setUserPrefs(getLocalUserPrefs());
+    const handleUpdate = () => {
+      setSubsList(getLocalSubscriptions());
+      setUserPrefs(getLocalUserPrefs());
+    };
+    handleUpdate();
+    window.addEventListener("storage_updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("storage_updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
   }, []);
 
   const currency = userPrefs.currency || "COP";
