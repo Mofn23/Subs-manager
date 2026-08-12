@@ -10,10 +10,11 @@ import { SubscriptionModal } from "@/components/modals/SubscriptionModal";
 import { MonaiFAB } from "@/components/ui/MonaiFAB";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { calculateMonthlyEquivalent, calculateSpendSummary, detectSubscriptionLeaks, formatCurrency, getAutoEmoji, getDaysUntil, SubscriptionItem } from "@/lib/financials";
+import { scheduleSubscriptionNotifications } from "@/lib/notifications";
 import { Plus, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface DashboardViewProps {
   initialSubscriptions: any[];
@@ -39,6 +40,13 @@ export function DashboardView({ initialSubscriptions }: DashboardViewProps) {
       trialEndDate: s.trialEndDate ? new Date(s.trialEndDate) : null,
     }));
   }, [initialSubscriptions]);
+
+  // Schedule native iOS notifications (3 days, 1 day, 0 days)
+  useEffect(() => {
+    if (subscriptions && subscriptions.length > 0) {
+      scheduleSubscriptionNotifications(subscriptions, currency);
+    }
+  }, [subscriptions, currency]);
 
   // Financial summary
   const spendSummary = useMemo(() => {

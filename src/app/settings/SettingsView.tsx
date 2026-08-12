@@ -4,9 +4,10 @@ import { deleteAccount, exportUserData, updateUserSettings } from "@/app/actions
 import { MonaiButton } from "@/components/ui/MonaiButton";
 import { MonaiPill } from "@/components/ui/MonaiPill";
 import { MonaiToggle } from "@/components/ui/MonaiToggle";
+import { requestNotificationPermissions, sendTestNotification } from "@/lib/notifications";
 import { userSettingsSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileJson, FileSpreadsheet, Laptop, Moon, Settings, ShieldAlert, Sun, Trash2 } from "lucide-react";
+import { BellRing, FileJson, FileSpreadsheet, Laptop, Moon, Settings, ShieldAlert, Sun, Trash2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -18,8 +19,19 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
   const [mounted, setMounted] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [testNotifMsg, setTestNotifMsg] = useState("");
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  const handleTestNativeNotif = async () => {
+    setTestNotifMsg("Enviando...");
+    const res = await sendTestNotification();
+    if (res?.error) {
+      setTestNotifMsg(`Error: ${res.error}`);
+    } else {
+      setTestNotifMsg("¡Enviada! Sonará en 2 segundos en tu iPhone.");
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -176,21 +188,35 @@ export function SettingsView({ initialUser }: { initialUser: any }) {
         </div>
 
         {/* MonAI SettingsRow: Notifications Toggle */}
-        <div className="flex items-center justify-between gap-4 p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)]">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[var(--tag)] text-2xl flex items-center justify-center shrink-0 border border-[var(--border)]">
-              🔔
+        <div className="p-4 rounded-[24px] bg-[var(--surface-elevated)] border border-[var(--border-subtle)] space-y-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-[var(--tag)] text-2xl flex items-center justify-center shrink-0 border border-[var(--border)]">
+                🔔
+              </div>
+              <div>
+                <h4 className="text-[17px] font-black text-[var(--text-primary)]">Notificaciones Nativas iOS</h4>
+                <p className="text-xs font-bold text-[var(--text-secondary)]">Avisos con sonido 3 días antes, 1 día antes y el mismo día</p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-[17px] font-black text-[var(--text-primary)]">Renewal Alerts</h4>
-              <p className="text-xs font-bold text-[var(--text-secondary)]">In-app notifications before charges</p>
-            </div>
+
+            <MonaiToggle
+              checked={notificationsEnabled}
+              onChange={setNotificationsEnabled}
+            />
           </div>
 
-          <MonaiToggle
-            checked={notificationsEnabled}
-            onChange={setNotificationsEnabled}
-          />
+          <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handleTestNativeNotif}
+              className="px-4 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 text-xs font-black border border-blue-500/30 flex items-center gap-2 transition active:scale-95"
+            >
+              <BellRing className="w-4 h-4" />
+              <span>Probar Notificación con Sonido</span>
+            </button>
+            {testNotifMsg && <span className="text-xs font-bold text-blue-400">{testNotifMsg}</span>}
+          </div>
         </div>
       </div>
 
